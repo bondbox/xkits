@@ -21,6 +21,7 @@ from .sheet import tabulate  # noqa:F401
 from .sheet import xls_reader  # noqa:F401
 from .sheet import xls_writer  # noqa:F401
 from .sheet import xlsx  # noqa:F401
+from .thread import NamedLock  # noqa:F401
 from .thread import TaskJob  # noqa:F401
 from .thread import TaskPool  # noqa:F401
 from .thread import ThreadPool  # noqa:F401
