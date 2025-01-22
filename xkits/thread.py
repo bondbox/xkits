@@ -18,7 +18,7 @@ from .actuator import Logger
 from .actuator import commands
 
 
-class thread_pool(ThreadPoolExecutor):
+class ThreadPool(ThreadPoolExecutor):
     '''Thread Pool'''
 
     def __init__(self, max_workers: Optional[int] = None,
@@ -53,7 +53,7 @@ class thread_pool(ThreadPoolExecutor):
         return {thread for thread in self.other_threads if thread.is_alive()}
 
 
-class task_job():  # pylint: disable=too-many-instance-attributes
+class TaskJob():  # pylint: disable=too-many-instance-attributes
     '''Task Job'''
 
     def __init__(self, no: int, fn: Callable, *args: Any, **kwargs: Any):
@@ -129,12 +129,12 @@ class task_job():  # pylint: disable=too-many-instance-attributes
 
 
 if sys.version_info >= (3, 9):
-    JobQueue = Queue[Optional[task_job]]  # noqa: E501, pylint: disable=unsubscriptable-object
+    JobQueue = Queue[Optional[TaskJob]]  # noqa: E501, pylint: disable=unsubscriptable-object
 else:  # Python3.8 TypeError
     JobQueue = Queue
 
 
-class task_pool(Dict[int, task_job]):  # noqa: E501, pylint: disable=too-many-instance-attributes
+class TaskPool(Dict[int, TaskJob]):  # noqa: E501, pylint: disable=too-many-instance-attributes
     '''Task Thread Pool'''
 
     def __init__(self, workers: int = 1, jobs: int = 0, prefix: str = "task"):
@@ -144,7 +144,7 @@ class task_pool(Dict[int, task_job]):  # noqa: E501, pylint: disable=too-many-in
         self.__jobs: JobQueue = Queue(qsize)
         self.__prefix: str = prefix or "task"
         self.__threads: Set[Thread] = set()
-        self.__intlock: Lock = Lock()
+        self.__intlock: Lock = Lock()  # internal lock
         self.__running: bool = False
         self.__workers: int = wsize
         self.__counter: int = 0
@@ -180,11 +180,6 @@ class task_pool(Dict[int, task_job]):  # noqa: E501, pylint: disable=too-many-in
         return self.__threads
 
     @property
-    def intlock(self) -> Lock:
-        '''internal lock'''
-        return self.__intlock
-
-    @property
     def running(self) -> bool:
         '''task threads are started'''
         return self.__running
@@ -217,7 +212,7 @@ class task_pool(Dict[int, task_job]):  # noqa: E501, pylint: disable=too-many-in
         logger: Logger = self.cmds.logger
         logger.debug("Task thread %s is running", current_thread().name)
         while True:
-            job: Optional[task_job] = self.jobs.get(block=True)
+            job: Optional[TaskJob] = self.jobs.get(block=True)
             if job is None:  # stop task
                 self.jobs.put(job)  # notice other tasks
                 break
@@ -232,17 +227,17 @@ class task_pool(Dict[int, task_job]):  # noqa: E501, pylint: disable=too-many-in
                      f"{counter} jobs: {suceess} suceess and {failure} failure"
                      )
 
-    def submit(self, fn: Callable, *args: Any, **kwargs: Any) -> task_job:
+    def submit(self, fn: Callable, *args: Any, **kwargs: Any) -> TaskJob:
         '''submit a task to jobs queue
 
         Returns:
             int: job id
         '''
         sn: int  # serial number
-        with self.intlock:  # generate job id under lock protection
+        with self.__intlock:  # generate job id under lock protection
             self.__counter += 1
             sn = self.__counter
-        job: task_job = task_job(sn, fn, *args, **kwargs)
+        job: TaskJob = TaskJob(sn, fn, *args, **kwargs)
         self.jobs.put(job, block=True)
         self.setdefault(sn, job)
         assert self[sn] is job
@@ -250,7 +245,7 @@ class task_pool(Dict[int, task_job]):  # noqa: E501, pylint: disable=too-many-in
 
     def shutdown(self) -> None:
         '''stop all task threads and waiting for all jobs finish'''
-        with self.intlock:  # block submit new tasks
+        with self.__intlock:  # block submit new tasks
             self.cmds.logger.debug("Shutdown %s tasks", self.thread_name_prefix)  # noqa:E501
             self.__running = False
             self.jobs.put(None)  # notice tasks
@@ -258,13 +253,13 @@ class task_pool(Dict[int, task_job]):  # noqa: E501, pylint: disable=too-many-in
                 thread: Thread = self.threads.pop()
                 thread.join()
             while not self.jobs.empty():
-                job: Optional[task_job] = self.jobs.get(block=True)
+                job: Optional[TaskJob] = self.jobs.get(block=True)
                 if job is not None:  # shutdown only after executed
                     raise RuntimeError(f"Unexecuted job: {job}")
 
     def startup(self) -> None:
         '''start task threads'''
-        with self.intlock:
+        with self.__intlock:
             self.cmds.logger.debug("Startup %s tasks", self.thread_name_prefix)
             for i in range(self.workers):
                 thread_name: str = f"{self.thread_name_prefix}_{i}"

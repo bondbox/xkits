@@ -21,8 +21,8 @@ from .sheet import tabulate  # noqa:F401
 from .sheet import xls_reader  # noqa:F401
 from .sheet import xls_writer  # noqa:F401
 from .sheet import xlsx  # noqa:F401
-from .thread import task_job  # noqa:F401
-from .thread import task_pool  # noqa:F401
-from .thread import thread_pool  # noqa:F401
+from .thread import TaskJob  # noqa:F401
+from .thread import TaskPool  # noqa:F401
+from .thread import ThreadPool  # noqa:F401
 from .utils import chdir  # noqa:F401
 from .utils import singleton  # noqa:F401

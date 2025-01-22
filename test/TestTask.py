@@ -1,6 +1,6 @@
 from time import sleep
 
-from xkits import task_pool
+from xkits import TaskPool
 
 
 def task(number: int):
@@ -8,7 +8,7 @@ def task(number: int):
     sleep(number % 3 + 1)
 
 
-with task_pool(workers=4) as executor:
+with TaskPool(workers=4) as executor:
     for n in range(1, 10):
         executor.submit(task, n)
     print("tasks submitted")
