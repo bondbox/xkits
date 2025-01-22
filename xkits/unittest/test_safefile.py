@@ -4,7 +4,7 @@ import os
 from tempfile import TemporaryDirectory
 import unittest
 
-from xarg import safile
+from xkits import safile
 
 
 class test_safile(unittest.TestCase):

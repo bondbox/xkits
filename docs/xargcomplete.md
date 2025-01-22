@@ -1,13 +1,13 @@
 xargcomplete
 ============
 
-`xarg` provides tab completion management for all `Python` command line programs written based on `argparse` and [argcomplete](https://kislyuk.github.io/argcomplete/).
+`xkits` provides tab completion management for all `Python` command line programs written based on `argparse` and [argcomplete](https://kislyuk.github.io/argcomplete/).
 
 Requires
 --------
 
 - `bash` or `zsh`
-- package depends on `xarg` and manage via `pip`
+- package depends on `xkits` and manage via `pip`
 
 Enable completion
 -----------------
@@ -16,8 +16,8 @@ Enable completion
 xargcomplete enable
 ```
 
-Update completion for all xarg-based `Python` packages
-------------------------------------------------------
+Update completion for all xkits-based `Python` packages
+-------------------------------------------------------
 
 ```shell
 xargcomplete update

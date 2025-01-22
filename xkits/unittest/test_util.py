@@ -2,7 +2,7 @@
 
 import unittest
 
-from xarg import chdir
+from xkits import chdir
 
 
 class test_chdir(unittest.TestCase):
@@ -23,7 +23,7 @@ class test_chdir(unittest.TestCase):
 
     def test_chdir(self):
         self.assertRaises(AssertionError, chdir().popd)
-        chdir().pushd("xarg")
+        chdir().pushd("xkits")
         chdir().pushd("unittest")
         chdir().popd()
         chdir().popd()

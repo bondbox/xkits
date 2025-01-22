@@ -1,7 +1,7 @@
-xarg
-====
+xkits
+=====
 
-Simple command-line tool based on `argparse`.
+Python toolkit.
 
 Language
 --------
@@ -23,7 +23,7 @@ Requires
 Build
 -----
 
-Fast build and install via [xpip](https://github.com/bondbox/xpip-python):
+Fast build and install via [xpip](https://github.com/bondbox/xpip):
 
 ```shell
 xpip-build setup --clean --all --install

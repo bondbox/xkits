@@ -33,7 +33,7 @@ jobs:
         make build install
     - name: Analysing the code with pylint
       run: |
-        pylint $(git ls-files xarg/*.py test/*.py example/*.py)
+        pylint $(git ls-files xkits/*.py test/*.py example/*.py)
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names

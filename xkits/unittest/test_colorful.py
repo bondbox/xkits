@@ -2,11 +2,11 @@
 
 import unittest
 
-from xarg import Back
-from xarg import Fore
-from xarg import Style
-from xarg import color
-from xarg import commands
+from xkits import Back
+from xkits import Fore
+from xkits import Style
+from xkits import color
+from xkits import commands
 
 
 class test_safile(unittest.TestCase):

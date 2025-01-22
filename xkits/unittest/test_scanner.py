@@ -5,7 +5,7 @@ import os
 import shutil
 import unittest
 
-from xarg import scanner
+from xkits import scanner
 
 
 def handler(obj: scanner.object) -> bool:
@@ -16,8 +16,8 @@ class test_scanner(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.scanner = scanner.load(paths=[os.path.join("xarg")],
-                                   exclude=[os.path.join("xarg", "test")],
+        cls.scanner = scanner.load(paths=[os.path.join("xkits")],
+                                   exclude=[os.path.join("xkits", "test")],
                                    handler=handler)
 
     @classmethod

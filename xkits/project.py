@@ -9,7 +9,9 @@ from .actuator import commands
 from .actuator import run_command
 from .attribute import __author__
 from .attribute import __author_email__
+from .attribute import __prog_name__
 from .attribute import __prog_project__
+from .attribute import __project__
 from .attribute import __urlhome__
 from .attribute import __version__
 from .parser import argp
@@ -115,7 +117,7 @@ test-clean: pytest-clean
 > Automatically created by {__prog_project__}.''')
 
     def init_requirements(self):
-        self.write("requirements.txt", f'''xarg-python >= {__version__}''')
+        self.write("requirements.txt", f'''{__project__} >= {__version__}''')
 
     def init_setup(self):
         # create setup.cfg
@@ -202,15 +204,15 @@ __author__ = "{__author__}"
 __author_email__ = "{__author_email__}"
 ''')
         self.write(os.path.join(self.folder, "command.py"),
-                   '''# coding:utf-8
+                   f'''# coding:utf-8
 
 from typing import Optional
 from typing import Sequence
 
-from xarg import add_command
-from xarg import argp
-from xarg import commands
-from xarg import run_command
+from {__prog_name__} import add_command
+from {__prog_name__} import argp
+from {__prog_name__} import commands
+from {__prog_name__} import run_command
 
 from .attribute import __description__
 from .attribute import __project__

@@ -6,7 +6,7 @@ import unittest
 
 import mock
 
-from xarg import argp
+from xkits import argp
 
 
 class test_argp(unittest.TestCase):
@@ -20,20 +20,20 @@ class test_argp(unittest.TestCase):
         pass
 
     def setUp(self):
-        self.argp = argp("xarg-test")
+        self.argp = argp("xkits-test")
 
     def tearDown(self):
         pass
 
     @mock.patch.object(sys, "exit")
     def test_help_optional_h(self, mock_exit: mock.Mock):
-        mock_exit.side_effect = [Exception("xarg-test")]
+        mock_exit.side_effect = [Exception("xkits-test")]
         self.assertRaises(Exception, self.argp.parse_args, "-h".split())
         mock_exit.assert_called_once_with(0)
 
     @mock.patch.object(sys, "exit")
     def test_help_optional_help(self, mock_exit: mock.Mock):
-        mock_exit.side_effect = [Exception("xarg-test")]
+        mock_exit.side_effect = [Exception("xkits-test")]
         self.assertRaises(Exception, self.argp.parse_args, "--help".split())
         mock_exit.assert_called_once_with(0)
 

@@ -272,9 +272,9 @@ class scanner:
             cmds.logger.debug("task thread[%s] exit", name)
 
         task_threads: List[Thread] = []
-        task_threads.append(Thread(target=task_scan, name="xarg-scan"))
+        task_threads.append(Thread(target=task_scan, name="xkits-scan"))
         task_threads.extend([
-            Thread(target=task_scan_path, name=f"xarg-scan{i}")
+            Thread(target=task_scan_path, name=f"xkits-scan{i}")
             for i in range(thds)
         ])
 

@@ -11,13 +11,13 @@ import unittest
 
 import mock
 
-from xarg import add_command
-from xarg import argp
-from xarg import commands
-from xarg import end_command
-from xarg import pre_command
-from xarg import run_command
-from xarg.attribute import __version__
+from xkits import add_command
+from xkits import argp
+from xkits import commands
+from xkits import end_command
+from xkits import pre_command
+from xkits import run_command
+from xkits.attribute import __version__
 
 
 @add_command("debug", help="test logger level")
@@ -163,20 +163,20 @@ class test_commands(unittest.TestCase):
 
     @mock.patch.object(sys, "exit")
     def test_help_action(self, mock_exit: mock.Mock):
-        mock_exit.side_effect = [Exception("xarg-test")]
+        mock_exit.side_effect = [Exception("xkits-test")]
         self.assertRaises(Exception, self.cmds.run, add_cmd, "--help".split())
         mock_exit.assert_called_once_with(0)
 
     @mock.patch.object(sys, "exit")
     def test_help_action_h(self, mock_exit: mock.Mock):
-        mock_exit.side_effect = [Exception("xarg-test")]
+        mock_exit.side_effect = [Exception("xkits-test")]
         self.assertRaises(Exception, self.cmds.run, add_cmd, "-h".split())
         mock_exit.assert_called_once_with(0)
 
     @mock.patch.object(sys, "exit")
     def test_version_action(self, mock_exit: mock.Mock):
         self.cmds.version = __version__
-        mock_exit.side_effect = [Exception("xarg-test")]
+        mock_exit.side_effect = [Exception("xkits-test")]
         self.assertRaises(Exception, self.cmds.run, add_cmd,
                           "--version".split())
         mock_exit.assert_called_once_with(0)

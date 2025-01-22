@@ -12,6 +12,7 @@ from typing import Sequence
 from typing import Set
 from typing import Tuple
 
+from .attribute import __project__
 from .attribute import __urlhome__
 
 try:
@@ -82,7 +83,7 @@ class argp(ArgumentParser):
                  prog: Optional[str] = None,
                  usage: Optional[str] = None,
                  prev_parser: Optional["argp"] = None,
-                 description: Optional[str] = "Command-line based on xarg.",
+                 description: Optional[str] = f"Command-line based on {__project__}.",  # noqa:E501
                  epilog: Optional[str] = f"For more, please visit {__urlhome__}",  # noqa:E501
                  **kwargs):
         kwargs.setdefault("prog", prog)

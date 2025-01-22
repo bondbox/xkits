@@ -1,5 +1,5 @@
-xarg todo list
-==============
+xkits todo list
+===============
 
 * [ ] README
 * [x] option argument

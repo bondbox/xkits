@@ -1,7 +1,7 @@
-xarg
-====
+xkits
+=====
 
-基于 `argparse` 的命令行工具。
+Python 工具包。
 
 特性
 ----
@@ -18,7 +18,7 @@ xarg
 构建
 ----
 
-通过 [xpip](https://github.com/bondbox/xpip-python) 工具可快速构建和安装：
+通过 [xpip](https://github.com/bondbox/xpip) 工具可快速构建和安装：
 
 ```shell
 xpip-build setup --clean --all --install

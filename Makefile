@@ -33,17 +33,17 @@ build: build-clean build-requirements
 install:
 	pip3 install --force-reinstall --no-deps dist/*.whl
 uninstall:
-	pip3 uninstall -y xarg-python
+	pip3 uninstall -y xkits
 reinstall: uninstall install
 
 
 test-prepare:
 	pip3 install --upgrade mock pylint flake8 pytest
 pylint:
-	pylint $(shell git ls-files xarg/*.py test/*.py example/*.py)
+	pylint $(shell git ls-files xkits/*.py test/*.py example/*.py)
 flake8:
-	flake8 xarg --count --select=E9,F63,F7,F82 --show-source --statistics
-	flake8 xarg --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+	flake8 xkits --count --select=E9,F63,F7,F82 --show-source --statistics
+	flake8 xkits --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 pytest:
 	pytest
 pytest-clean:

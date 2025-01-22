@@ -3,15 +3,15 @@
 from setuptools import find_packages
 from setuptools import setup
 
-from xarg.attribute import __author__
-from xarg.attribute import __author_email__
-from xarg.attribute import __description__
-from xarg.attribute import __project__
-from xarg.attribute import __urlbugs__
-from xarg.attribute import __urlcode__
-from xarg.attribute import __urldocs__
-from xarg.attribute import __urlhome__
-from xarg.attribute import __version__
+from xkits.attribute import __author__
+from xkits.attribute import __author_email__
+from xkits.attribute import __description__
+from xkits.attribute import __project__
+from xkits.attribute import __urlbugs__
+from xkits.attribute import __urlcode__
+from xkits.attribute import __urldocs__
+from xkits.attribute import __urlhome__
+from xkits.attribute import __version__
 
 
 def all_requirements():
@@ -33,5 +33,5 @@ setup(
     project_urls={"Source Code": __urlcode__,
                   "Bug Tracker": __urlbugs__,
                   "Documentation": __urldocs__},
-    packages=find_packages(include=["xarg*"], exclude=["tests"]),
+    packages=find_packages(include=["xkits*"], exclude=["tests"]),
     install_requires=all_requirements())

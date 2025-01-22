@@ -1,6 +1,6 @@
 from time import time
 
-from xarg import cmds
+from xkits import cmds
 
 if __name__ == "__main__":
     cmds.initiate_logger(logger=cmds.logger)

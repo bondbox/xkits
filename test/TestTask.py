@@ -1,6 +1,6 @@
 from time import sleep
 
-from xarg import task_pool
+from xkits import task_pool
 
 
 def task(number: int):

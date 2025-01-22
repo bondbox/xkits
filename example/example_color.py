@@ -1,7 +1,7 @@
 # coding:utf-8
 
-from xarg import Style
-from xarg import color
+from xkits import Style
+from xkits import color
 
 
 def example_background():

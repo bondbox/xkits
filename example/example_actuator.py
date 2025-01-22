@@ -4,10 +4,10 @@
 from typing import List
 from typing import Optional
 
-from xarg import add_command
-from xarg import argp
-from xarg import commands
-from xarg import run_command
+from xkits import add_command
+from xkits import argp
+from xkits import commands
+from xkits import run_command
 
 
 @add_command('key', help="item key")
@@ -69,7 +69,7 @@ def run(args) -> int:
 def main(argv: Optional[List[str]] = None) -> int:
     return commands().run(
         argv=argv,
-        prog="xarg-example",
+        prog="xkits-example",
         description="Simple command-line tool based on argparse.")
 
 
