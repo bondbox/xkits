@@ -52,15 +52,15 @@ class thread_pool(ThreadPoolExecutor):
         return {thread for thread in self.other_threads if thread.is_alive()}
 
 
-class task_job():
+class task_job():  # pylint: disable=R0902
     '''Task Job'''
 
-    def __init__(self, id: int, fn: Callable, *args: Any, **kwargs: Any):
-        self.__id: int = id
+    def __init__(self, no: int, fn: Callable, *args: Any, **kwargs: Any):
+        self.__no: int = no
         self.__fn: Callable = fn
         self.__args: Tuple[Any, ...] = args
         self.__kwargs: Dict[str, Any] = kwargs
-        self.__result: Any = LookupError(f"Job{id} is not started")
+        self.__result: Any = LookupError(f"Job{no} is not started")
         self.__created: float = time()
         self.__started: float = 0.0
         self.__stopped: float = 0.0
@@ -73,7 +73,7 @@ class task_job():
     @property
     def id(self) -> int:
         '''job id'''
-        return self.__id
+        return self.__no
 
     @property
     def fn(self) -> Callable:
@@ -120,14 +120,14 @@ class task_job():
             self.__started = time()
             self.__result = self.fn(*self.args, **self.kwargs)
             return True
-        except Exception as error:
+        except Exception as error:  # pylint: disable=broad-exception-caught
             self.__result = error
             return False
         finally:
             self.__stopped = time()
 
 
-class task_pool(dict[int, task_job]):
+class task_pool(dict[int, task_job]):  # pylint: disable=R0902
     '''Task Thread Pool'''
 
     def __init__(self, workers: int = 1, jobs: int = 0, prefix: str = "task"):
@@ -208,7 +208,7 @@ class task_pool(dict[int, task_job]):
         suceess: int = 0
         failure: int = 0
         logger: Logger = self.cmds.logger
-        logger.debug(f"Task thread {current_thread().name} is running")
+        logger.debug("Task thread %s is running", current_thread().name)
         while True:
             job: Optional[task_job] = self.jobs.get(block=True)
             if job is None:  # stop task
@@ -221,8 +221,9 @@ class task_pool(dict[int, task_job]):
             else:
                 self.__suceess += 1
                 suceess += 1
-        info: str = f"{counter} jobs: {suceess} suceess and {failure} failure"
-        logger.debug(f"Task thread {current_thread().name} is stopped, {info}")
+        logger.debug("Task thread %s is stopped, %s", current_thread().name,
+                     f"{counter} jobs: {suceess} suceess and {failure} failure"
+                     )
 
     def submit(self, fn: Callable, *args: Any, **kwargs: Any) -> task_job:
         '''submit a task to jobs queue
@@ -230,20 +231,20 @@ class task_pool(dict[int, task_job]):
         Returns:
             int: job id
         '''
-        id: int
+        sn: int  # serial number
         with self.intlock:  # generate job id under lock protection
             self.__counter += 1
-            id = self.__counter
-        job: task_job = task_job(id, fn, *args, **kwargs)
+            sn = self.__counter
+        job: task_job = task_job(sn, fn, *args, **kwargs)
         self.jobs.put(job, block=True)
-        self.setdefault(id, job)
-        assert self[id] is job
+        self.setdefault(sn, job)
+        assert self[sn] is job
         return job
 
     def shutdown(self) -> None:
         '''stop all task threads and waiting for all jobs finish'''
         with self.intlock:  # block submit new tasks
-            self.cmds.logger.debug(f"Shutdown {self.thread_name_prefix} tasks")
+            self.cmds.logger.debug("Shutdown %s tasks", self.thread_name_prefix)  # noqa:E501
             self.__running = False
             self.jobs.put(None)  # notice tasks
             while len(self.threads) > 0:
@@ -257,7 +258,7 @@ class task_pool(dict[int, task_job]):
     def startup(self) -> None:
         '''start task threads'''
         with self.intlock:
-            self.cmds.logger.debug(f"Startup {self.thread_name_prefix} tasks")
+            self.cmds.logger.debug("Startup %s tasks", self.thread_name_prefix)
             for i in range(self.workers):
                 thread_name: str = f"{self.thread_name_prefix}_{i}"
                 thread = Thread(name=thread_name, target=self.task)
