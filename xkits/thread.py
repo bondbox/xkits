@@ -2,6 +2,7 @@
 
 from concurrent.futures import ThreadPoolExecutor
 from queue import Queue
+import sys
 from threading import Lock
 from threading import Thread
 from threading import current_thread
@@ -52,7 +53,7 @@ class thread_pool(ThreadPoolExecutor):
         return {thread for thread in self.other_threads if thread.is_alive()}
 
 
-class task_job():  # pylint: disable=R0902
+class task_job():  # pylint: disable=too-many-instance-attributes
     '''Task Job'''
 
     def __init__(self, no: int, fn: Callable, *args: Any, **kwargs: Any):
@@ -127,14 +128,20 @@ class task_job():  # pylint: disable=R0902
             self.__stopped = time()
 
 
-class task_pool(dict[int, task_job]):  # pylint: disable=R0902
+if sys.version_info >= (3, 9):
+    JobQueue = Queue[Optional[task_job]]  # noqa: E501, pylint: disable=unsubscriptable-object
+else:  # Python3.8 TypeError
+    JobQueue = Queue
+
+
+class task_pool(Dict[int, task_job]):  # noqa: E501, pylint: disable=too-many-instance-attributes
     '''Task Thread Pool'''
 
     def __init__(self, workers: int = 1, jobs: int = 0, prefix: str = "task"):
         wsize: int = max(workers, 1)
         qsize = max(wsize, jobs) if jobs > 0 else jobs
-        self.__jobs: Queue[Optional[task_job]] = Queue(qsize)
         self.__cmds: commands = commands()
+        self.__jobs: JobQueue = Queue(qsize)
         self.__prefix: str = prefix or "task"
         self.__threads: Set[Thread] = set()
         self.__intlock: Lock = Lock()
@@ -153,7 +160,7 @@ class task_pool(dict[int, task_job]):  # pylint: disable=R0902
         self.shutdown()
 
     @property
-    def jobs(self) -> Queue[Optional[task_job]]:
+    def jobs(self) -> JobQueue:
         '''task jobs'''
         return self.__jobs
 
