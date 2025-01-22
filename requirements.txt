@@ -7,3 +7,5 @@ tabulate
 wcwidth
 xlrd
 xlwt
+requests
+beautifulsoup4
