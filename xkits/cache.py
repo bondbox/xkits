@@ -10,6 +10,8 @@ from typing import Optional
 from typing import TypeVar
 from typing import Union
 
+ANT = TypeVar("ANT")
+ADT = TypeVar("ADT")
 INT = TypeVar("INT")
 IDT = TypeVar("IDT")
 PIT = TypeVar("PIT")
@@ -32,14 +34,14 @@ class CacheExpired(CacheLookup):
         super().__init__(f"Cache {name} expired")
 
 
-class CacheItem(Generic[INT, IDT]):
+class CacheAtom(Generic[ANT, ADT]):
     '''Data cache without update'''
 
-    def __init__(self, name: INT, data: IDT, lifetime: CacheTimeout = 0):
+    def __init__(self, name: ANT, data: ADT, lifetime: CacheTimeout = 0):
         self.__lifetime: float = float(lifetime)
         self.__timestamp: float = time()
-        self.__name: INT = name
-        self.__data: IDT = data
+        self.__name: ANT = name
+        self.__data: ADT = data
 
     def __str__(self) -> str:
         return f"cache object at {id(self)} name={self.name}"
@@ -67,14 +69,25 @@ class CacheItem(Generic[INT, IDT]):
         return self.life > 0.0 and self.age > self.life
 
     @property
-    def name(self) -> INT:
+    def name(self) -> ANT:
         return self.__name
+
+    @property
+    def data(self) -> ADT:
+        return self.__data
+
+
+class CacheItem(CacheAtom[INT, IDT]):
+    '''Data cache with enforces expiration check'''
+
+    def __init__(self, name: INT, data: IDT, lifetime: CacheTimeout = 0):
+        super().__init__(name, data, lifetime)
 
     @property
     def data(self) -> IDT:
         if self.expired:
             raise CacheExpired(self.name)
-        return self.__data
+        return super().data
 
 
 class CachePool(Generic[PIT, PVT]):

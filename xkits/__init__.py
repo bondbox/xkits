@@ -7,6 +7,7 @@ from .actuator import commands  # noqa:F401
 from .actuator import end_command  # noqa:F401
 from .actuator import pre_command  # noqa:F401
 from .actuator import run_command  # noqa:F401
+from .cache import CacheAtom  # noqa:F401
 from .cache import CacheExpired  # noqa:F401
 from .cache import CacheItem  # noqa:F401
 from .cache import CacheLookup  # noqa:F401
