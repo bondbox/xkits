@@ -20,28 +20,32 @@ from .cache import CacheTimeout
 
 
 class PageSession(object):  # pylint: disable=useless-object-inheritance
-    def __init__(self, session: Session):
+    '''Website page without cached response'''
+
+    def __init__(self, url: str, session: Session):
         self.__session: Session = session
-
-    @property
-    def session(self) -> Session:
-        return self.__session
-
-    def get(self, url) -> Response:
-        response = self.session.get(url)
-        response.raise_for_status()
-        return response
-
-
-class Page(PageSession):
-    def __init__(self, url: str, session: Optional[Session] = None):
-        super().__init__(session=session or Session())
-        self.__response: Optional[Response] = None
         self.__url: str = url
 
     @property
     def url(self) -> str:
         return self.__url
+
+    @property
+    def session(self) -> Session:
+        return self.__session
+
+    def get(self) -> Response:
+        response = self.session.get(self.url)
+        response.raise_for_status()
+        return response
+
+
+class Page(PageSession):
+    '''Website page with cached response'''
+
+    def __init__(self, url: str, session: Optional[Session] = None):
+        super().__init__(url=url, session=session or Session())
+        self.__response: Optional[Response] = None
 
     @property
     def label(self) -> str:
@@ -52,7 +56,7 @@ class Page(PageSession):
     @property
     def response(self) -> Response:
         if self.__response is None:
-            self.__response = self.get(url=self.url)
+            self.__response = self.get()
         return self.__response
 
     @property
@@ -67,6 +71,8 @@ class Page(PageSession):
 
 
 class PageCache(CachePool[str, Page]):
+    '''Website pages cache pool'''
+
     def __init__(self, session: Optional[Session] = None,
                  lifetime: CacheTimeout = 0):
         self.__session: Optional[Session] = session
@@ -89,6 +95,9 @@ class PageCache(CachePool[str, Page]):
 
 
 class Site(PageCache):
+
+    '''Website with pages cache pool'''
+
     def __init__(self, base: str, session: Optional[Session] = None,
                  lifetime: CacheTimeout = 0):
         super().__init__(session=session, lifetime=lifetime)
