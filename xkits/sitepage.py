@@ -26,6 +26,9 @@ class PageSession(object):  # pylint: disable=useless-object-inheritance
         self.__session: Session = session
         self.__url: str = url
 
+    def __str__(self) -> str:
+        return f"page object at {id(self)} url={self.url}"
+
     @property
     def url(self) -> str:
         return self.__url
@@ -78,6 +81,9 @@ class PageCache(CachePool[str, Page]):
         self.__session: Optional[Session] = session
         super().__init__(lifetime=lifetime)
 
+    def __str__(self) -> str:
+        return f"website pages cache pool at {id(self)}"
+
     def __getitem__(self, url: str) -> Page:
         return self.fetch(url=url)
 
@@ -104,6 +110,9 @@ class Site(PageCache):
         components: ParseResult = urlparse(url=base)
         self.__baseurl: str = urlunparse(components)
         self.__components: ParseResult = components
+
+    def __str__(self) -> str:
+        return f"website {self.base} with pages cache pool"
 
     @property
     def scheme(self) -> str:
