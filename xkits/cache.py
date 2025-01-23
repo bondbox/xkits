@@ -1,14 +1,14 @@
 # coding:utf-8
 
+from threading import Lock
 from time import time
 from typing import Any
 from typing import Dict
+from typing import Generator
 from typing import Generic
 from typing import Optional
 from typing import TypeVar
 from typing import Union
-
-from .thread import NamedLock
 
 INT = TypeVar("INT")
 IDT = TypeVar("IDT")
@@ -70,8 +70,21 @@ class CachePool(Generic[PIT, PVT]):
 
     def __init__(self, lifetime: CacheTimeout = 0):
         self.__pool: Dict[PIT, CacheItem[PIT, PVT]] = {}
-        self.__namedlock: NamedLock[PIT] = NamedLock()
         self.__lifetime: float = float(lifetime)
+        self.__intlock: Lock = Lock()  # internal lock
+
+    def __len__(self) -> int:
+        with self.__intlock:
+            return len(self.__pool)
+
+    def __iter__(self) -> Generator[PIT, Any, None]:
+        with self.__intlock:
+            for index in self.__pool:
+                yield index
+
+    def __contains__(self, index: PIT) -> bool:
+        with self.__intlock:
+            return index in self.__pool
 
     def __setitem__(self, index: PIT, value: PVT) -> None:
         return self.put(index, value)
@@ -89,11 +102,11 @@ class CachePool(Generic[PIT, PVT]):
     def put(self, index: PIT, value: PVT, lifetime: Optional[CacheTimeout] = None) -> None:  # noqa:E501
         life = lifetime if lifetime is not None else self.lifetime
         item = CacheItem(index, value, life)
-        with self.__namedlock[index]:
+        with self.__intlock:
             self.__pool[index] = item
 
     def get(self, index: PIT) -> PVT:
-        with self.__namedlock[index]:
+        with self.__intlock:
             try:
                 item = self.__pool[index]
                 data = item.data
@@ -106,6 +119,6 @@ class CachePool(Generic[PIT, PVT]):
                 raise CacheMiss(index) from exc
 
     def delete(self, index: PIT) -> None:
-        with self.__namedlock[index]:
+        with self.__intlock:
             if index in self.__pool:
                 del self.__pool[index]
