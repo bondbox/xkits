@@ -49,7 +49,13 @@ class CacheItem(Generic[INT, IDT]):
 
     @property
     def life(self) -> float:
+        '''lifetime'''
         return self.__lifetime
+
+    @property
+    def down(self) -> float:
+        '''countdown'''
+        return self.life - self.age if self.life > 0.0 else 0.0
 
     @property
     def expired(self) -> bool:
