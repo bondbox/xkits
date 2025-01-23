@@ -73,7 +73,7 @@ class CachePool(Generic[PIT, PVT]):
         self.__namedlock: NamedLock[PIT] = NamedLock()
         self.__lifetime: float = float(lifetime)
 
-    def __setattr__(self, index: PIT, value: PVT) -> None:
+    def __setitem__(self, index: PIT, value: PVT) -> None:
         return self.put(index, value)
 
     def __getitem__(self, index: PIT) -> PVT:
