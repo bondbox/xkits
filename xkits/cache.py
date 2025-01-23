@@ -33,11 +33,16 @@ class CacheExpired(CacheLookup):
 
 
 class CacheItem(Generic[INT, IDT]):
+    '''Data cache without update'''
+
     def __init__(self, name: INT, data: IDT, lifetime: CacheTimeout = 0):
         self.__lifetime: float = float(lifetime)
         self.__timestamp: float = time()
         self.__name: INT = name
         self.__data: IDT = data
+
+    def __str__(self) -> str:
+        return f"cache object at {id(self)} name={self.name}"
 
     @property
     def up(self) -> float:
@@ -73,11 +78,15 @@ class CacheItem(Generic[INT, IDT]):
 
 
 class CachePool(Generic[PIT, PVT]):
+    '''Data cache pool'''
 
     def __init__(self, lifetime: CacheTimeout = 0):
         self.__pool: Dict[PIT, CacheItem[PIT, PVT]] = {}
         self.__lifetime: float = float(lifetime)
         self.__intlock: Lock = Lock()  # internal lock
+
+    def __str__(self) -> str:
+        return f"cache pool at {id(self)}"
 
     def __len__(self) -> int:
         with self.__intlock:
