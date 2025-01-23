@@ -4,6 +4,7 @@ from time import sleep
 import unittest
 
 from xkits import CacheAtom
+from xkits import CacheData
 from xkits import CacheExpired
 from xkits import CacheItem
 from xkits import CachePool
@@ -27,11 +28,20 @@ class test_cache(unittest.TestCase):
         pass
 
     def test_cache_atom(self):
-        item = CacheAtom(self.index, self.value, 0.1)
+        item = CacheAtom(self.value, 0.1)
         sleep(0.2)
         self.assertTrue(item.expired)
         self.assertLess(item.down, 0)
         self.assertEqual(item.data, self.value)
+
+    def test_cache_data(self):
+        def read(item: CacheData):
+            return item.data
+        item = CacheData(self.value, 0.1)
+        sleep(0.2)
+        self.assertTrue(item.expired)
+        self.assertLess(item.down, 0)
+        self.assertRaises(CacheExpired, read, item)
 
     def test_cache_item(self):
         def read(item: CacheItem):

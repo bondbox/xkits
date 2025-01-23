@@ -10,13 +10,6 @@ from typing import Optional
 from typing import TypeVar
 from typing import Union
 
-ANT = TypeVar("ANT")
-ADT = TypeVar("ADT")
-INT = TypeVar("INT")
-IDT = TypeVar("IDT")
-PIT = TypeVar("PIT")
-PVT = TypeVar("PVT")
-
 CacheTimeout = Union[float, int]
 
 
@@ -30,21 +23,23 @@ class CacheMiss(CacheLookup):
 
 
 class CacheExpired(CacheLookup):
-    def __init__(self, name: Any):
-        super().__init__(f"Cache {name} expired")
+    def __init__(self, name: Optional[Any] = None):
+        super().__init__("Cache expired" if name is None else f"Cache {name} expired")  # noqa:E501
 
 
-class CacheAtom(Generic[ANT, ADT]):
-    '''Data cache without update'''
+CADT = TypeVar("CADT")
 
-    def __init__(self, name: ANT, data: ADT, lifetime: CacheTimeout = 0):
+
+class CacheAtom(Generic[CADT]):
+    '''Data cache without name and update'''
+
+    def __init__(self, data: CADT, lifetime: CacheTimeout = 0):
         self.__lifetime: float = float(lifetime)
         self.__timestamp: float = time()
-        self.__name: ANT = name
-        self.__data: ADT = data
+        self.__data: CADT = data
 
     def __str__(self) -> str:
-        return f"cache object at {id(self)} name={self.name}"
+        return f"cache object at {id(self)}"
 
     @property
     def up(self) -> float:
@@ -69,32 +64,68 @@ class CacheAtom(Generic[ANT, ADT]):
         return self.life > 0.0 and self.age > self.life
 
     @property
-    def name(self) -> ANT:
-        return self.__name
-
-    @property
-    def data(self) -> ADT:
+    def data(self) -> CADT:
         return self.__data
 
 
-class CacheItem(CacheAtom[INT, IDT]):
+CDT = TypeVar("CDT")
+
+
+class CacheData(CacheAtom[CDT]):
     '''Data cache with enforces expiration check'''
 
-    def __init__(self, name: INT, data: IDT, lifetime: CacheTimeout = 0):
+    @property
+    def data(self) -> CDT:
+        if self.expired:
+            raise CacheExpired()
+        return super().data
+
+
+NCNT = TypeVar("NCNT")
+NCDT = TypeVar("NCDT")
+
+
+class NamedCache(CacheAtom[NCDT], Generic[NCNT, NCDT]):
+    '''Named data cache without update'''
+
+    def __init__(self, name: NCNT, data: NCDT, lifetime: CacheTimeout = 0):
+        super().__init__(data, lifetime)
+        self.__name: NCNT = name
+
+    def __str__(self) -> str:
+        return f"cache object at {id(self)} name={self.name}"
+
+    @property
+    def name(self) -> NCNT:
+        return self.__name
+
+
+CINT = TypeVar("CINT")
+CIDT = TypeVar("CIDT")
+
+
+class CacheItem(NamedCache[CINT, CIDT]):
+    '''Named data cache with enforces expiration check'''
+
+    def __init__(self, name: CINT, data: CIDT, lifetime: CacheTimeout = 0):
         super().__init__(name, data, lifetime)
 
     @property
-    def data(self) -> IDT:
+    def data(self) -> CIDT:
         if self.expired:
             raise CacheExpired(self.name)
         return super().data
 
 
-class CachePool(Generic[PIT, PVT]):
+CPIT = TypeVar("CPIT")
+CPVT = TypeVar("CPVT")
+
+
+class CachePool(Generic[CPIT, CPVT]):
     '''Data cache pool'''
 
     def __init__(self, lifetime: CacheTimeout = 0):
-        self.__pool: Dict[PIT, CacheItem[PIT, PVT]] = {}
+        self.__pool: Dict[CPIT, CacheItem[CPIT, CPVT]] = {}
         self.__lifetime: float = float(lifetime)
         self.__intlock: Lock = Lock()  # internal lock
 
@@ -105,34 +136,34 @@ class CachePool(Generic[PIT, PVT]):
         with self.__intlock:
             return len(self.__pool)
 
-    def __iter__(self) -> Generator[PIT, Any, None]:
+    def __iter__(self) -> Generator[CPIT, Any, None]:
         with self.__intlock:
             yield from self.__pool
 
-    def __contains__(self, index: PIT) -> bool:
+    def __contains__(self, index: CPIT) -> bool:
         with self.__intlock:
             return index in self.__pool
 
-    def __setitem__(self, index: PIT, value: PVT) -> None:
+    def __setitem__(self, index: CPIT, value: CPVT) -> None:
         return self.put(index, value)
 
-    def __getitem__(self, index: PIT) -> PVT:
+    def __getitem__(self, index: CPIT) -> CPVT:
         return self.get(index)
 
-    def __delitem__(self, index: PIT) -> None:
+    def __delitem__(self, index: CPIT) -> None:
         return self.delete(index)
 
     @property
     def lifetime(self) -> float:
         return self.__lifetime
 
-    def put(self, index: PIT, value: PVT, lifetime: Optional[CacheTimeout] = None) -> None:  # noqa:E501
+    def put(self, index: CPIT, value: CPVT, lifetime: Optional[CacheTimeout] = None) -> None:  # noqa:E501
         life = lifetime if lifetime is not None else self.lifetime
         item = CacheItem(index, value, life)
         with self.__intlock:
             self.__pool[index] = item
 
-    def get(self, index: PIT) -> PVT:
+    def get(self, index: CPIT) -> CPVT:
         with self.__intlock:
             try:
                 item = self.__pool[index]
@@ -145,7 +176,7 @@ class CachePool(Generic[PIT, PVT]):
             except KeyError as exc:
                 raise CacheMiss(index) from exc
 
-    def delete(self, index: PIT) -> None:
+    def delete(self, index: CPIT) -> None:
         with self.__intlock:
             if index in self.__pool:
                 del self.__pool[index]
