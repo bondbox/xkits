@@ -85,8 +85,7 @@ class CachePool(Generic[PIT, PVT]):
 
     def __iter__(self) -> Generator[PIT, Any, None]:
         with self.__intlock:
-            for index in self.__pool:
-                yield index
+            yield from self.__pool
 
     def __contains__(self, index: PIT) -> bool:
         with self.__intlock:
