@@ -5,6 +5,7 @@ from datetime import datetime
 import os
 from typing import Dict
 from typing import Optional
+from urllib.parse import ParseResult
 from urllib.parse import urljoin
 from urllib.parse import urlparse
 from urllib.parse import urlunparse
@@ -75,8 +76,8 @@ class PageCache(CachePool[str, Page]):
         return self.fetch(url=url)
 
     @property
-    def session(self) -> Optional[Session]:
-        return self.__session
+    def session(self) -> Session:
+        return self.__session or Session()
 
     def fetch(self, url: str, session: Optional[Session] = None) -> Page:
         while True:
@@ -90,33 +91,37 @@ class PageCache(CachePool[str, Page]):
 class Site(PageCache):
     def __init__(self, base: str, session: Optional[Session] = None,
                  lifetime: CacheTimeout = 0):
-        components = urlparse(url=base)
-        self.__session: Session = session or Session()
-        self.__scheme: str = components.scheme or "https"
-        self.__netloc: str = components.netloc or components.path
-        self.__scheme_and_netloc: str = urlunparse((self.scheme, self.netloc, '', '', '', ''))  # noqa:E501
-        super().__init__(session=self.session, lifetime=lifetime)
+        super().__init__(session=session, lifetime=lifetime)
+        components: ParseResult = urlparse(url=base)
+        self.__baseurl: str = urlunparse(components)
+        self.__components: ParseResult = components
 
     @property
     def scheme(self) -> str:
-        return self.__scheme
+        return self.__components.scheme
 
     @property
     def netloc(self) -> str:
-        return self.__netloc
+        return self.__components.netloc
 
     @property
-    def scheme_and_netloc(self) -> str:
-        return self.__scheme_and_netloc
+    def main(self) -> str:
+        '''main page url'''
+        return urlunparse((self.scheme, self.netloc, '', '', '', ''))
 
     @property
-    def session(self) -> Session:
-        return self.__session
+    def base(self) -> str:
+        '''base url'''
+        return self.__baseurl
+
+    def parse(self, *path: str) -> str:
+        '''parse page url'''
+        site: str = "/".join([self.__components.path] + list(path))
+        return urljoin(base=self.main, url=site)
 
     def login(self, url: str, data: Dict[str, str]) -> Response:
         response = self.session.post(url=url, data=data)
         return response
 
     def page(self, *path: str) -> Page:
-        url: str = urljoin(base=self.scheme_and_netloc, url="/".join(path))
-        return self.fetch(url=url, session=self.session)
+        return self.fetch(url=self.parse(*path), session=self.session)
