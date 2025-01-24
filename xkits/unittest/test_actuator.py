@@ -279,7 +279,7 @@ class test_commands_logger(unittest.TestCase):
         pass
 
     def test_disable_logger(self):
-        self.cmds.enable_logger = False
+        self.cmds.enabled_logger = False
         ret = self.cmds.run(argv=[])
         self.assertEqual(ret, 0)
 
