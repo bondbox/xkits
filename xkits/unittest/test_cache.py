@@ -8,6 +8,7 @@ from xkits import CacheData
 from xkits import CacheExpired
 from xkits import CacheItem
 from xkits import CachePool
+from ..cache import NamedCache
 
 
 class test_cache(unittest.TestCase):
@@ -33,6 +34,8 @@ class test_cache(unittest.TestCase):
         self.assertTrue(item.expired)
         self.assertLess(item.down, 0)
         self.assertEqual(item.data, self.value)
+        item.data = "atom"
+        self.assertEqual(item.data, "atom")
 
     def test_cache_data(self):
         def read(item: CacheData):
@@ -42,6 +45,17 @@ class test_cache(unittest.TestCase):
         self.assertTrue(item.expired)
         self.assertLess(item.down, 0)
         self.assertRaises(CacheExpired, read, item)
+        item.data = "data"
+        self.assertEqual(item.data, "data")
+
+    def test_named_cache(self):
+        item = NamedCache(self.index, self.value, 0.1)
+        sleep(0.2)
+        self.assertTrue(item.expired)
+        self.assertLess(item.down, 0)
+        self.assertEqual(item.data, self.value)
+        item.data = "name"
+        self.assertEqual(item.data, "name")
 
     def test_cache_item(self):
         def read(item: CacheItem):
@@ -51,6 +65,8 @@ class test_cache(unittest.TestCase):
         self.assertTrue(item.expired)
         self.assertLess(item.down, 0)
         self.assertRaises(CacheExpired, read, item)
+        item.data = "item"
+        self.assertEqual(item.data, "item")
 
     def test_cache_pool(self):
         pool = CachePool()

@@ -31,11 +31,11 @@ CADT = TypeVar("CADT")
 
 
 class CacheAtom(Generic[CADT]):
-    '''Data cache without name and update'''
+    '''Data cache without name'''
 
     def __init__(self, data: CADT, lifetime: CacheTimeout = 0):
         self.__lifetime: float = float(lifetime)
-        self.__timestamp: float = time()
+        self.__uptime: float = time()
         self.__data: CADT = data
 
     def __str__(self) -> str:
@@ -43,10 +43,12 @@ class CacheAtom(Generic[CADT]):
 
     @property
     def up(self) -> float:
-        return self.__timestamp
+        '''uptime'''
+        return self.__uptime
 
     @property
     def age(self) -> float:
+        '''runtime'''
         return time() - self.up
 
     @property
@@ -56,16 +58,31 @@ class CacheAtom(Generic[CADT]):
 
     @property
     def down(self) -> float:
-        '''countdown'''
+        '''downtime'''
         return self.life - self.age if self.life > 0.0 else 0.0
 
     @property
     def expired(self) -> bool:
         return self.life > 0.0 and self.age > self.life
 
+    def renew(self, lifetime: Optional[CacheTimeout] = None) -> None:
+        '''renew uptime and lifetime(optional)'''
+        if lifetime is not None:
+            self.__lifetime = float(lifetime)
+        self.__uptime = time()
+
+    def update(self, data: CADT) -> None:
+        '''update cache data'''
+        self.__data = data
+        self.renew()
+
     @property
     def data(self) -> CADT:
         return self.__data
+
+    @data.setter
+    def data(self, data: CADT) -> None:
+        self.update(data)
 
 
 CDT = TypeVar("CDT")
@@ -80,13 +97,17 @@ class CacheData(CacheAtom[CDT]):
             raise CacheExpired()
         return super().data
 
+    @data.setter
+    def data(self, data: CDT) -> None:
+        super().update(data)
+
 
 NCNT = TypeVar("NCNT")
 NCDT = TypeVar("NCDT")
 
 
 class NamedCache(CacheAtom[NCDT], Generic[NCNT, NCDT]):
-    '''Named data cache without update'''
+    '''Named data cache'''
 
     def __init__(self, name: NCNT, data: NCDT, lifetime: CacheTimeout = 0):
         super().__init__(data, lifetime)
@@ -115,6 +136,10 @@ class CacheItem(NamedCache[CINT, CIDT]):
         if self.expired:
             raise CacheExpired(self.name)
         return super().data
+
+    @data.setter
+    def data(self, data: CIDT) -> None:
+        super().update(data)
 
 
 CPIT = TypeVar("CPIT")
