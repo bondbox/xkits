@@ -313,7 +313,7 @@ class xls_writer():
             self.book.save(abspath)
             safile.delete_backup(path=abspath)
             return True
-        except Exception:  # pylint: disable=broad-except, pragma: no cover
+        except Exception:  # pragma: no cover, pylint: disable=broad-except
             # f"failed to write file {abspath}"
             return False  # pragma: no cover
 

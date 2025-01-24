@@ -182,7 +182,7 @@ class TaskJob():  # pylint: disable=too-many-instance-attributes
 
 
 if sys.version_info >= (3, 9):
-    JobQueue = Queue[Optional[TaskJob]]  # noqa: E501, pylint: disable=unsubscriptable-object, pragma: no cover
+    JobQueue = Queue[Optional[TaskJob]]  # noqa: E501, pragma: no cover, pylint: disable=unsubscriptable-object
 else:  # Python3.8 TypeError
     JobQueue = Queue  # pragma: no cover
 
