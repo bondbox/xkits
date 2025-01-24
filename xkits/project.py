@@ -54,6 +54,22 @@ class project:
                 hdl.write(content)
         return True
 
+    def init_requirements(self):
+        self.write("requirements.txt", f'''{__project__} >= {__version__}''')
+
+    def init_coveragerc(self):
+        self.write(".coveragerc", f'''[run]
+omit =
+    {self.folder}/unittest/*
+
+[report]
+exclude_lines =
+    pragma: no cover
+    raise NotImplementedError
+    if __name__ == .__main__.:
+    def __repr__
+''')
+
     def init_pylintrc(self):
         self.write(".pylintrc", '''[MASTER]
 disable=
@@ -71,10 +87,10 @@ all: build install test
 
 
 clean-cover:
-	rm -rf cover .coverage
-clean-tox: clean-cover
+	rm -rf cover .coverage coverage.xml htmlcov
+clean-tox:
 	rm -rf .stestr .tox
-clean: build-clean test-clean clean-tox
+clean: build-clean test-clean clean-cover clean-tox
 
 
 upload:
@@ -97,27 +113,82 @@ reinstall: uninstall install
 
 
 test-prepare:
-	pip3 install --upgrade mock pylint flake8 pytest
+	pip3 install --upgrade mock pylint flake8 pytest pytest-cov
 pylint:
 	pylint $(shell git ls-files {self.folder}/*.py test/*.py example/*.py)
 flake8:
 	flake8 {self.folder} --count --select=E9,F63,F7,F82 --show-source --statistics
 	flake8 {self.folder} --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 pytest:
-	pytest
+	pytest --cov={self.folder} --cov-report=term-missing --cov-report=xml --cov-report=html --cov-config=.coveragerc --cov-fail-under=100
 pytest-clean:
 	rm -rf .pytest_cache
 test: test-prepare pylint flake8 pytest
 test-clean: pytest-clean
 ''')  # noqa:W191,E101,E501
 
+    def init_project(self):
+        os.makedirs(self.folder, exist_ok=True)
+        self.write(os.path.join(self.folder, "__init__.py"),
+                   '''# coding:utf-8''')
+        self.write(os.path.join(self.folder, "attribute.py"),
+                   f'''# coding:utf-8
+
+from urllib.parse import urljoin
+
+__project__ = "{self.name}"
+__version__ = "0.1.alpha.1"
+__description__ = "Automatically created by {__prog_project__}."
+__urlhome__ = "{__urlhome__}"
+__urlcode__ = __urlhome__
+__urldocs__ = __urlhome__
+__urlbugs__ = urljoin(__urlhome__, "issues")
+
+# author
+__author__ = "{__author__}"
+__author_email__ = "{__author_email__}"
+''')
+        self.write(os.path.join(self.folder, "command.py"),
+                   f'''# coding:utf-8
+
+from typing import Optional
+from typing import Sequence
+
+from {__prog_name__} import add_command
+from {__prog_name__} import argp
+from {__prog_name__} import commands
+from {__prog_name__} import run_command
+
+from .attribute import __description__
+from .attribute import __project__
+from .attribute import __urlhome__
+from .attribute import __version__
+
+
+@add_command(__project__)
+def add_cmd(_arg: argp):
+    pass
+
+
+@run_command(add_cmd)
+def run_cmd(cmds: commands) -> int:
+    return 0
+
+
+def main(argv: Optional[Sequence[str]] = None) -> int:
+    cmds = commands()
+    cmds.version = __version__
+    return cmds.run(
+        root=add_cmd,
+        argv=argv,
+        description=__description__,
+        epilog=f"For more, please visit {__urlhome__}.")
+''')
+
     def init_readme(self):
         self.write("README.md", f'''# {self.name}
 
 > Automatically created by {__prog_project__}.''')
-
-    def init_requirements(self):
-        self.write("requirements.txt", f'''{__project__} >= {__version__}''')
 
     def init_setup(self):
         # create setup.cfg
@@ -182,71 +253,14 @@ setup(
     install_requires=all_requirements())
 ''')
 
-    def init_project(self):
-        os.makedirs(self.folder, exist_ok=True)
-        self.write(os.path.join(self.folder, "__init__.py"),
-                   '''# coding:utf-8''')
-        self.write(os.path.join(self.folder, "attribute.py"),
-                   f'''# coding:utf-8
-
-from urllib.parse import urljoin
-
-__project__ = "{self.name}"
-__version__ = "0.1.alpha.1"
-__description__ = "Automatically created by {__prog_project__}."
-__urlhome__ = "{__urlhome__}"
-__urlcode__ = __urlhome__
-__urldocs__ = __urlhome__
-__urlbugs__ = urljoin(__urlhome__, "issues")
-
-# author
-__author__ = "{__author__}"
-__author_email__ = "{__author_email__}"
-''')
-        self.write(os.path.join(self.folder, "command.py"),
-                   f'''# coding:utf-8
-
-from typing import Optional
-from typing import Sequence
-
-from {__prog_name__} import add_command
-from {__prog_name__} import argp
-from {__prog_name__} import commands
-from {__prog_name__} import run_command
-
-from .attribute import __description__
-from .attribute import __project__
-from .attribute import __urlhome__
-from .attribute import __version__
-
-
-@add_command(__project__)
-def add_cmd(_arg: argp):
-    pass
-
-
-@run_command(add_cmd)
-def run_cmd(cmds: commands) -> int:
-    return 0
-
-
-def main(argv: Optional[Sequence[str]] = None) -> int:
-    cmds = commands()
-    cmds.version = __version__
-    return cmds.run(
-        root=add_cmd,
-        argv=argv,
-        description=__description__,
-        epilog=f"For more, please visit {__urlhome__}.")
-''')
-
     def create(self) -> int:
+        self.init_requirements()
+        self.init_coveragerc()
         self.init_pylintrc()
         self.init_makefile()
-        self.init_readme()
-        self.init_requirements()
-        self.init_setup()
         self.init_project()
+        self.init_readme()
+        self.init_setup()
         return 0
 
 
