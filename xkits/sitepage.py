@@ -82,7 +82,7 @@ class PageCache(CachePool[str, Page]):
         super().__init__(lifetime=lifetime)
 
     def __str__(self) -> str:
-        return f"website pages cache pool at {id(self)}"
+        return f"website pages cache pool at {id(self)}"  # pragma: no cover
 
     def __getitem__(self, url: str) -> Page:
         return self.fetch(url=url)
