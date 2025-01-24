@@ -82,3 +82,7 @@ class test_scanner(unittest.TestCase):
         object = scanner.object(path)
         self.scanner.add(object)
         self.assertIs(self.scanner[path], object)
+
+
+if __name__ == "__main__":
+    unittest.main()

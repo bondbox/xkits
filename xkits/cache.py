@@ -4,8 +4,8 @@ from threading import Lock
 from time import time
 from typing import Any
 from typing import Dict
-from typing import Generator
 from typing import Generic
+from typing import Iterator
 from typing import Optional
 from typing import TypeVar
 from typing import Union
@@ -161,9 +161,9 @@ class CachePool(Generic[CPIT, CPVT]):
         with self.__intlock:
             return len(self.__pool)
 
-    def __iter__(self) -> Generator[CPIT, Any, None]:
+    def __iter__(self) -> Iterator[CPIT]:
         with self.__intlock:
-            yield from self.__pool
+            return iter(self.__pool.keys())
 
     def __contains__(self, index: CPIT) -> bool:
         with self.__intlock:
