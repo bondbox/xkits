@@ -61,8 +61,8 @@ class stfile:
         '''
         try:
             return getpwuid(self.uid).pw_name
-        except KeyError:
-            return str(self.uid)
+        except KeyError:  # pragma: no cover
+            return str(self.uid)  # pragma: no cover
 
     @username.setter
     def username(self, owner: Union[int, str]):
@@ -76,8 +76,8 @@ class stfile:
         '''
         try:
             return getgrgid(self.gid).gr_name
-        except KeyError:
-            return str(self.gid)
+        except KeyError:  # pragma: no cover
+            return str(self.gid)  # pragma: no cover
 
     @groupname.setter
     def groupname(self, group: Union[int, str]):
