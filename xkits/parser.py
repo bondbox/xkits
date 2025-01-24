@@ -17,8 +17,8 @@ from .attribute import __urlhome__
 
 try:
     from argcomplete import autocomplete
-except ModuleNotFoundError:
-    pass
+except ModuleNotFoundError:  # pragma: no cover
+    pass  # pragma: no cover
 
 
 class checker():
@@ -188,8 +188,8 @@ class argp(ArgumentParser):
     ) -> Namespace:
         try:
             autocomplete(self)  # For tab completion
-        except NameError:
-            pass
+        except NameError:  # pragma: no cover
+            pass  # pragma: no cover
         return super().parse_args(args, namespace)  # type: ignore
 
     def parse_known_args(  # pylint: disable=useless-parent-delegation
