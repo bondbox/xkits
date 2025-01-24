@@ -66,9 +66,9 @@ class NamedLock(Generic[LKNT]):
                     assert self.__locks[name] is lock
                     return lock
 
-                lock = self.__locks[name]
-                assert lock.name == name
-                return lock
+                lock = self.__locks[name]  # pragma: no cover
+                assert lock.name == name  # pragma: no cover
+                return lock  # pragma: no cover
 
 
 class ThreadPool(ThreadPoolExecutor):
@@ -182,9 +182,9 @@ class TaskJob():  # pylint: disable=too-many-instance-attributes
 
 
 if sys.version_info >= (3, 9):
-    JobQueue = Queue[Optional[TaskJob]]  # noqa: E501, pylint: disable=unsubscriptable-object
+    JobQueue = Queue[Optional[TaskJob]]  # noqa: E501, pylint: disable=unsubscriptable-object, pragma: no cover
 else:  # Python3.8 TypeError
-    JobQueue = Queue
+    JobQueue = Queue  # pragma: no cover
 
 
 class TaskPool(Dict[int, TaskJob]):  # noqa: E501, pylint: disable=too-many-instance-attributes
@@ -308,7 +308,7 @@ class TaskPool(Dict[int, TaskJob]):  # noqa: E501, pylint: disable=too-many-inst
             while not self.jobs.empty():
                 job: Optional[TaskJob] = self.jobs.get(block=True)
                 if job is not None:  # shutdown only after executed
-                    raise RuntimeError(f"Unexecuted job: {job}")
+                    raise RuntimeError(f"Unexecuted job: {job}")  # noqa:E501, pragma: no cover
 
     def startup(self) -> None:
         '''start task threads'''
