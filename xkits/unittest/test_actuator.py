@@ -120,7 +120,7 @@ def end_cmd_purge(cmds: commands) -> int:
     return 1
 
 
-@add_command("example")
+@add_command("example", description="example")
 def add_cmd(_arg: argp):
     commands().stdout("test")
 

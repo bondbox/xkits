@@ -69,7 +69,7 @@ class add_command:
     @property
     def func(self) -> Callable[[argp], None]:
         if self.__func is None:
-            raise ValueError("No function")
+            raise ValueError("No function")  # pragma: no cover
         return self.__func
 
     @property
@@ -179,7 +179,7 @@ class run_command:
     @property
     def func(self) -> Callable[["commands"], int]:
         if self.__func is None:
-            raise ValueError("No function")
+            raise ValueError("No function")  # pragma: no cover
         return self.__func
 
     @property
@@ -244,7 +244,7 @@ class pre_command:
     @property
     def func(self) -> Callable[["commands"], int]:
         if self.__func is None:
-            raise ValueError("No function")
+            raise ValueError("No function")  # pragma: no cover
         return self.__func
 
     @property
@@ -287,7 +287,7 @@ class end_command:
     @property
     def func(self) -> Callable[["commands"], int]:
         if self.__func is None:
-            raise ValueError("No function")
+            raise ValueError("No function")  # pragma: no cover
         return self.__func
 
     @property
