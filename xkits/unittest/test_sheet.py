@@ -5,11 +5,14 @@ from tempfile import TemporaryDirectory
 from typing import Union
 import unittest
 
+from xkits import cell
 from xkits import csv
 from xkits import form
+from xkits import row
 from xkits import tabulate
 from xkits import xls_reader
 from xkits import xls_writer
+from xkits import xlsx
 
 
 class test_sheet(unittest.TestCase):
@@ -46,6 +49,13 @@ class test_sheet(unittest.TestCase):
         self.assertEqual(len(self.fake_form), 3)
         self.assertEqual(self.fake_form.new_map(),
                          {"name": None, "score": None})
+        self.assertEqual(self.fake_form.column_no("name"), 0)
+        self.assertEqual(self.fake_form.column_no("score"), 1)
+
+    def test_form_sort(self):
+        def handle(items: row[str, Union[str, int]]) -> cell[Union[str, int]]:
+            return items[1]
+        self.fake_form.sort(handle)
 
     def test_tabulate(self):
         print(tabulate(self.fake_form))
@@ -83,6 +93,17 @@ class test_sheet(unittest.TestCase):
             reader = xls_reader(path)
             reader.load_sheets()
             self.assertEqual(reader.file, path)
+
+    def test_xlsx_load_sheets(self):
+        path = os.path.join("test", "example.xlsx")
+        reader = xlsx(path)
+        reader.load_sheets()
+        self.assertEqual(reader.file, path)
+
+    def test_xlsx_load_sheet(self):
+        path = os.path.join("test", "example.xlsx")
+        reader = xlsx(path)
+        reader.load_sheet()
 
 
 if __name__ == "__main__":

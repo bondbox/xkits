@@ -162,11 +162,11 @@ class form(Generic[FKT, FVT]):
     def column_no(self, key: FKT) -> int:
         return self.header.index(key)
 
-    def sort(self, key: Callable[[row[FKT, FVT]], cell[FVT]],
+    def sort(self, fn: Callable[[row[FKT, FVT]], cell[FVT]],
              reverse: bool = False) -> None:
         """sort rows using a Lambda function as the key.
         """
-        self.__rows.sort(key=lambda row: key(row).value,  # type: ignore
+        self.__rows.sort(key=lambda row: fn(row).value,  # type: ignore
                          reverse=reverse)
 
     def dump(self) -> Tuple[Tuple[Any, ...], ...]:
@@ -313,9 +313,9 @@ class xls_writer():
             self.book.save(abspath)
             safile.delete_backup(path=abspath)
             return True
-        except Exception:  # pylint: disable=broad-except
+        except Exception:  # pylint: disable=broad-except, pragma: no cover
             # f"failed to write file {abspath}"
-            return False
+            return False  # pragma: no cover
 
     def dump_sheet(self, table: form[Any, Any]):
         sheet: xlwt.Worksheet = self.book.add_sheet(
@@ -361,10 +361,8 @@ class xlsx():
         def get_default_sheet_name() -> str:
             if isinstance(sheet_name, str):
                 return sheet_name
-            active_sheet = self.book.active
-            if active_sheet is not None:
-                return active_sheet.title
-            return self.book.sheetnames[0]
+            active = self.book.active
+            return self.book.sheetnames[0] if active is None else active.title
 
         sheet = self.book[get_default_sheet_name()]
         first = list(sheet.iter_rows(max_row=1))[0]

@@ -24,8 +24,10 @@ from .parser import argp  # noqa:F401
 from .safefile import safile  # noqa:F401
 from .safefile import stfile  # noqa:F401
 from .scanner import scanner  # noqa:F401
+from .sheet import cell  # noqa:F401
 from .sheet import csv  # noqa:F401
 from .sheet import form  # noqa:F401
+from .sheet import row  # noqa:F401
 from .sheet import tabulate  # noqa:F401
 from .sheet import xls_reader  # noqa:F401
 from .sheet import xls_writer  # noqa:F401
