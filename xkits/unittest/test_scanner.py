@@ -30,6 +30,9 @@ class test_scanner(unittest.TestCase):
     def tearDown(self):
         pass
 
+    def test_load(self):
+        self.assertIsInstance(scanner.load(paths=[os.path.join("scanloader")], handler=handler), scanner)  # noqa:E501
+
     def test_iter(self):
         for object in self.scanner:
             self.assertIsInstance(object, scanner.object)
