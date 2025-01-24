@@ -1,0 +1,12 @@
+[run]
+omit =
+    xkits/complete.py
+    xkits/project.py
+    xkits/unittest/*
+
+[report]
+exclude_lines =
+    pragma: no cover
+    raise NotImplementedError
+    if __name__ == .__main__.:
+    def __repr__
