@@ -182,7 +182,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         root=add_cmd,
         argv=argv,
         description=__description__,
-        epilog=f"For more, please visit {__urlhome__}.")
+        epilog=f"For more, please visit {{__urlhome__}}.")
 ''')
 
     def init_readme(self):
