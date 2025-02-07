@@ -1,8 +1,9 @@
 # coding:utf-8
 
 from argparse import Namespace
-from errno import EINTR
+from errno import ECANCELED
 from errno import ENOENT
+from errno import ENOTRECOVERABLE
 import logging
 from logging import Logger
 import sys
@@ -711,10 +712,10 @@ class commands(log):
                 return ret
             return self.__run(args, root)
         except KeyboardInterrupt:
-            return EINTR
+            return ECANCELED
         except BaseException:  # pylint: disable=broad-except
             self.logger.exception("Something went wrong:")
-            return 10000
+            return ENOTRECOVERABLE
 
 
 cmds: commands = commands()
