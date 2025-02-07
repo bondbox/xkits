@@ -1,8 +1,9 @@
 # coding:utf-8
 
 from argparse import Namespace
-from errno import EINTR
+from errno import ECANCELED
 from errno import ENOENT
+from errno import ENOTRECOVERABLE
 import os
 import sys
 from tempfile import TemporaryDirectory
@@ -230,13 +231,13 @@ class test_commands(unittest.TestCase):
 
     def test_run_KeyboardInterrupt(self):
         ret = self.cmds.run(argv="keyboard --stderr -d".split())
-        self.assertEqual(ret, EINTR)
+        self.assertEqual(ret, ECANCELED)
 
     def test_run_BaseException(self):
         with TemporaryDirectory() as _tmp:
             path = os.path.join(_tmp, "log.txt")
             ret = self.cmds.run(argv=f"exception --log {path}".split())
-            self.assertEqual(ret, 10000)
+            self.assertEqual(ret, ENOTRECOVERABLE)
 
     def test_run_prepare(self):
         ret = self.cmds.run(argv="prepare --stdout --debug".split())
