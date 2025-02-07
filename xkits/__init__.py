@@ -35,6 +35,8 @@ from .sheet import xls_writer  # noqa:F401
 from .sheet import xlsx  # noqa:F401
 from .sitepage import Page  # noqa:F401
 from .sitepage import PageCache  # noqa:F401
+from .sitepage import ProxyProtocol  # noqa:F401
+from .sitepage import ProxySession  # noqa:F401
 from .sitepage import Site  # noqa:F401
 from .thread import NamedLock  # noqa:F401
 from .thread import TaskJob  # noqa:F401

@@ -2,6 +2,7 @@
 
 from base64 import b64encode
 from datetime import datetime
+from enum import Enum
 import os
 from typing import Dict
 from typing import Optional
@@ -19,7 +20,43 @@ from .cache import CachePool
 from .cache import CacheTimeout
 
 
-class PageSession(object):  # pylint: disable=useless-object-inheritance
+class ProxyProtocol(Enum):
+    HTTP = "http"
+    HTTPS = "https"
+    SOCKS4 = "socks4"
+    SOCKS5 = "socks5"
+
+
+class ProxySession(Session):
+
+    def __init__(self, protocol: ProxyProtocol, host: str, port: int):
+        if not isinstance(protocol, ProxyProtocol):
+            raise ValueError(f"Invalid proxy protocol: {protocol}")
+        proxies = {
+            "http": f"{protocol.value}://{host}:{port}",
+            "https": f"{protocol.value}://{host}:{port}",
+        }
+        super(ProxySession, self).__init__()
+        self.proxies.update(proxies)
+
+    @classmethod
+    def http_proxy(cls, host: str, port: int = 80) -> "ProxySession":
+        return cls(ProxyProtocol.HTTP, host, port)
+
+    @classmethod
+    def https_proxy(cls, host: str, port: int = 443) -> "ProxySession":
+        return cls(ProxyProtocol.HTTPS, host, port)
+
+    @classmethod
+    def socks4_proxy(cls, host: str, port: int = 1080) -> "ProxySession":
+        return cls(ProxyProtocol.SOCKS4, host, port)
+
+    @classmethod
+    def socks5_proxy(cls, host: str, port: int = 1080) -> "ProxySession":
+        return cls(ProxyProtocol.SOCKS5, host, port)
+
+
+class PageConnect(object):  # pylint: disable=useless-object-inheritance
     '''Website page without cached response'''
 
     def __init__(self, url: str, session: Session):
@@ -43,7 +80,7 @@ class PageSession(object):  # pylint: disable=useless-object-inheritance
         return response
 
 
-class Page(PageSession):
+class Page(PageConnect):
     '''Website page with cached response'''
 
     def __init__(self, url: str, session: Optional[Session] = None):
