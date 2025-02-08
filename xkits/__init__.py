@@ -20,7 +20,7 @@ from .colorful import Back  # noqa:F401
 from .colorful import Fore  # noqa:F401
 from .colorful import Style  # noqa:F401
 from .colorful import color  # noqa:F401
-from .execute import hourglass  # noqa:F401
+from .executor import hourglass  # noqa:F401
 from .parser import argp  # noqa:F401
 from .safefile import safile  # noqa:F401
 from .safefile import stfile  # noqa:F401

@@ -5,7 +5,7 @@ from concurrent.futures import TimeoutError as ThreadTimeout
 from typing import Callable
 from typing import Union
 
-Timeout = Union[float, int]
+ExecuteTimeUnit = Union[float, int]
 
 
 class Executor():  # pylint: disable=too-few-public-methods
@@ -14,7 +14,7 @@ class Executor():  # pylint: disable=too-few-public-methods
         self.__args = args
         self.__kwargs = kwargs
 
-    def countdown(self, seconds: Timeout):
+    def countdown(self, seconds: ExecuteTimeUnit):
         with ThreadPoolExecutor() as executor:
             try:
                 future = executor.submit(self.__fn, *self.__args, **self.__kwargs)  # noqa:E501
@@ -24,7 +24,7 @@ class Executor():  # pylint: disable=too-few-public-methods
                 raise TimeoutError(message) from exc
 
 
-def hourglass(seconds: Timeout):
+def hourglass(seconds: ExecuteTimeUnit):
     def decorator(fn):
         def inner(*args, **kwargs):
             return Executor(fn, *args, **kwargs).countdown(seconds)
