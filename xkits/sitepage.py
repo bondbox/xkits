@@ -17,7 +17,7 @@ from requests import Session
 
 from .cache import CacheMiss
 from .cache import CachePool
-from .cache import CacheTimeout
+from .cache import CacheTimeUnit
 
 
 class ProxyProtocol(Enum):
@@ -114,7 +114,7 @@ class PageCache(CachePool[str, Page]):
     '''Website pages cache pool'''
 
     def __init__(self, session: Optional[Session] = None,
-                 lifetime: CacheTimeout = 0):
+                 lifetime: CacheTimeUnit = 0):
         self.__session: Optional[Session] = session
         super().__init__(lifetime=lifetime)
 
@@ -142,7 +142,7 @@ class Site(PageCache):
     '''Website with pages cache pool'''
 
     def __init__(self, base: str, session: Optional[Session] = None,
-                 lifetime: CacheTimeout = 0):
+                 lifetime: CacheTimeUnit = 0):
         super().__init__(session=session, lifetime=lifetime)
         components: ParseResult = urlparse(url=base)
         self.__baseurl: str = urlunparse(components)

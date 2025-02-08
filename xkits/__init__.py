@@ -14,7 +14,7 @@ from .cache import CacheItem  # noqa:F401
 from .cache import CacheLookup  # noqa:F401
 from .cache import CacheMiss  # noqa:F401
 from .cache import CachePool  # noqa:F401
-from .cache import CacheTimeout  # noqa:F401
+from .cache import CacheTimeUnit  # noqa:F401
 from .cache import NamedCache  # noqa:F401
 from .colorful import Back  # noqa:F401
 from .colorful import Fore  # noqa:F401
