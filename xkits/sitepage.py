@@ -21,6 +21,7 @@ from .cache import CachePool
 from .cache import CacheTimeUnit
 
 SessionTimeUnit = Union[float, int]
+SessionTimeout = Optional[SessionTimeUnit]
 
 
 class ProxyProtocol(Enum):
@@ -62,8 +63,8 @@ class ProxySession(Session):
 class PageConnect(object):  # pylint: disable=useless-object-inheritance
     '''Website page without cached response'''
 
-    def __init__(self, url: str, session: Session, timeout: Optional[SessionTimeUnit] = None):  # noqa:E501
-        self.__timeout: Optional[SessionTimeUnit] = timeout
+    def __init__(self, url: str, session: Session, timeout: SessionTimeout = None):  # noqa:E501
+        self.__timeout: SessionTimeout = timeout
         self.__session: Session = session
         self.__url: str = url
 
@@ -79,12 +80,11 @@ class PageConnect(object):  # pylint: disable=useless-object-inheritance
         return self.__session
 
     @property
-    def timeout(self) -> Optional[SessionTimeUnit]:
+    def timeout(self) -> SessionTimeout:
         return self.__timeout
 
-    def get(self, timeout: Optional[SessionTimeUnit] = None) -> Response:
-        _timeout: Optional[SessionTimeUnit] = timeout or self.timeout
-        response = self.session.get(self.url, timeout=_timeout)
+    def get(self, timeout: SessionTimeout = None) -> Response:
+        response = self.session.get(self.url, timeout=timeout or self.timeout)
         response.raise_for_status()
         return response
 
@@ -92,8 +92,8 @@ class PageConnect(object):  # pylint: disable=useless-object-inheritance
 class Page(PageConnect):
     '''Website page with cached response'''
 
-    def __init__(self, url: str, session: Optional[Session] = None):
-        super().__init__(url=url, session=session or Session())
+    def __init__(self, url: str, session: Optional[Session] = None, timeout: SessionTimeout = None):  # noqa:E501
+        super().__init__(url=url, session=session or Session(), timeout=timeout)  # noqa:E501
         self.__response: Optional[Response] = None
 
     @property
@@ -137,17 +137,18 @@ class PageCache(CachePool[str, Page]):
     def session(self) -> Session:
         return self.__session or Session()
 
-    def fetch(self, url: str, session: Optional[Session] = None) -> Page:
+    def fetch(self, url: str, session: Optional[Session] = None,
+              timeout: SessionTimeout = None) -> Page:
         while True:
             try:
                 return super().get(url)
             except CacheMiss:
-                page = Page(url=url, session=session or self.session)
+                page = Page(url=url, session=session or self.session,
+                            timeout=timeout)
                 super().put(url, page)
 
 
 class Site(PageCache):
-
     '''Website with pages cache pool'''
 
     def __init__(self, base: str, session: Optional[Session] = None,
@@ -187,5 +188,5 @@ class Site(PageCache):
         response = self.session.post(url=url, data=data)
         return response
 
-    def page(self, *path: str) -> Page:
-        return self.fetch(url=self.parse(*path), session=self.session)
+    def page(self, *path: str, timeout: SessionTimeout = None) -> Page:
+        return self.fetch(url=self.parse(*path), session=self.session, timeout=timeout)  # noqa:E501
