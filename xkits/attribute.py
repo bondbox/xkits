@@ -3,7 +3,7 @@
 from urllib.parse import urljoin
 
 __project__ = "xkits"
-__version__ = "2.1.1"
+__version__ = "2.1.2"
 __description__ = "Python toolkit."
 __urlhome__ = f"https://github.com/bondbox/{__project__}/"
 __urlcode__ = __urlhome__
