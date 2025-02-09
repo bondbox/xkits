@@ -6,6 +6,7 @@ from enum import Enum
 import os
 from typing import Dict
 from typing import Optional
+from typing import Union
 from urllib.parse import ParseResult
 from urllib.parse import urljoin
 from urllib.parse import urlparse
@@ -18,6 +19,8 @@ from requests import Session
 from .cache import CacheMiss
 from .cache import CachePool
 from .cache import CacheTimeUnit
+
+SessionTimeUnit = Union[float, int]
 
 
 class ProxyProtocol(Enum):
@@ -59,7 +62,8 @@ class ProxySession(Session):
 class PageConnect(object):  # pylint: disable=useless-object-inheritance
     '''Website page without cached response'''
 
-    def __init__(self, url: str, session: Session):
+    def __init__(self, url: str, session: Session, timeout: Optional[SessionTimeUnit] = None):  # noqa:E501
+        self.__timeout: Optional[SessionTimeUnit] = timeout
         self.__session: Session = session
         self.__url: str = url
 
@@ -74,8 +78,13 @@ class PageConnect(object):  # pylint: disable=useless-object-inheritance
     def session(self) -> Session:
         return self.__session
 
-    def get(self) -> Response:
-        response = self.session.get(self.url)
+    @property
+    def timeout(self) -> Optional[SessionTimeUnit]:
+        return self.__timeout
+
+    def get(self, timeout: Optional[SessionTimeUnit] = None) -> Response:
+        _timeout: Optional[SessionTimeUnit] = timeout or self.timeout
+        response = self.session.get(self.url, timeout=_timeout)
         response.raise_for_status()
         return response
 
