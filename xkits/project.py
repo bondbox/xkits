@@ -165,7 +165,7 @@ from .attribute import __urlhome__
 from .attribute import __version__
 
 
-@add_command(__project__)
+@add_command(__project__, description=__description__)
 def add_cmd(_arg: argp):
     pass
 
@@ -178,11 +178,7 @@ def run_cmd(cmds: commands) -> int:
 def main(argv: Optional[Sequence[str]] = None) -> int:
     cmds = commands()
     cmds.version = __version__
-    return cmds.run(
-        root=add_cmd,
-        argv=argv,
-        description=__description__,
-        epilog=f"For more, please visit {{__urlhome__}}.")
+    return cmds.run(root=add_cmd, argv=argv, epilog=f"For more, please visit {{__urlhome__}}.")  # noqa:E501
 ''')
 
     def init_readme(self):
@@ -280,7 +276,7 @@ def run_cmd_init(cmds: commands) -> int:
                    ).create()
 
 
-@add_command(__prog_project__)
+@add_command(__prog_project__, description="Create a command-line project.")
 def add_cmd(_arg: argp):
     pass
 
@@ -293,8 +289,4 @@ def run_cmd(cmds: commands) -> int:  # pylint: disable=unused-argument
 def main(argv: Optional[Sequence[str]] = None) -> int:
     cmds = commands()
     cmds.version = __version__
-    return cmds.run(
-        root=add_cmd,
-        argv=argv,
-        description="Create a command-line project.",
-        epilog=f"For more, please visit {__urlhome__}.")
+    return cmds.run(root=add_cmd, argv=argv, epilog=f"For more, please visit {__urlhome__}.")  # noqa:E501

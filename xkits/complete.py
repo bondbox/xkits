@@ -220,7 +220,7 @@ def run_cmd_list(cmds: commands) -> int:
     return 0
 
 
-@add_command(__prog_complete__)
+@add_command(__prog_complete__, description="Tab completion management.")
 def add_cmd(_arg: argp):
     pass
 
@@ -237,8 +237,4 @@ def run_cmd(cmds: commands) -> int:
 def main(argv: Optional[Sequence[str]] = None) -> int:
     cmds = commands()
     cmds.version = __version__
-    return cmds.run(
-        root=add_cmd,
-        argv=argv,
-        description="Tab completion management.",
-        epilog=f"For more, please visit {__urlhome__}.")
+    return cmds.run(root=add_cmd, argv=argv, epilog=f"For more, please visit {__urlhome__}.")  # noqa:E501
