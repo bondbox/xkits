@@ -40,7 +40,7 @@ class ProxySession(Session):
             "http": f"{protocol.value}://{host}:{port}",
             "https": f"{protocol.value}://{host}:{port}",
         }
-        super(ProxySession, self).__init__()
+        super(ProxySession, self).__init__()  # pylint: disable=R1725
         self.proxies.update(proxies)
 
     @classmethod
