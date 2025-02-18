@@ -17,6 +17,7 @@ from typing import Sequence
 from typing import Tuple
 
 from .attribute import __prog_name__
+from .colorful import color
 from .logger import log
 from .parser import argp
 from .utils import singleton
@@ -409,11 +410,21 @@ class commands(log):
         sys.stdout.write(f"{context}\n")
         sys.stdout.flush()
 
+    def stdout_green(self, context: Any):
+        '''Output string to sys.stdout with green color.
+        '''
+        self.stdout(color.green(context))
+
     def stderr(self, context: Any):
         '''Output string to sys.stderr.
         '''
         sys.stderr.write(f"{context}\n")
         sys.stderr.flush()
+
+    def stderr_red(self, context: Any):
+        '''Output string to sys.stderr with red color.
+        '''
+        self.stderr(color.red(context))
 
     def __add_optional_version(self, _arg: argp):
         version = self.version
