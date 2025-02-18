@@ -2,6 +2,7 @@
 
 from argparse import Namespace
 from errno import ECANCELED
+from errno import EINVAL
 from errno import ENOENT
 from errno import ENOTRECOVERABLE
 import logging
@@ -588,6 +589,14 @@ class commands(log):
             _cmd.func(_arg)
             self.__add_inner_parser_tail(_arg)
 
+    @classmethod
+    def check_error(cls, value: Any) -> int:
+        '''Check value is an error.
+
+        Return True if value is an error, otherwise False.
+        '''
+        return value if isinstance(value, int) else 0 if value in (None, True) else EINVAL  # noqa:E501
+
     def parse(self, root: Optional[add_command] = None,
               argv: Optional[Sequence[str]] = None, **kwargs) -> Namespace:
         '''Parse the command line.
@@ -636,7 +645,7 @@ class commands(log):
 
         if not root.bind.skip or not self.has_sub(root, args):
             ret = root.bind.func(self)
-            if ret != 0 and ret is not None:
+            if self.check_error(ret):
                 return ret
 
         if hasattr(args, root.sub_dest):
@@ -647,7 +656,7 @@ class commands(log):
                     assert isinstance(sub, add_command)
                     if sub.name == sub_dest:
                         ret = self.__run(args, sub)
-                        if ret != 0 and ret is not None:
+                        if self.check_error(ret):
                             return ret
 
         done = root.bind.done
@@ -655,7 +664,7 @@ class commands(log):
             assert isinstance(done, end_command)
             if not root.bind.skip or not self.has_sub(root, args):
                 ret = done.func(self)  # purge
-                if ret != 0 and ret is not None:
+                if self.check_error(ret):
                     return ret
         return 0
 
@@ -668,7 +677,7 @@ class commands(log):
             assert isinstance(prep, pre_command)
             if not root.bind.skip or not self.has_sub(root, args):
                 ret = prep.func(self)
-                if ret != 0 and ret is not None:
+                if self.check_error(ret):
                     return ret
 
         if hasattr(args, root.sub_dest):
@@ -708,7 +717,7 @@ class commands(log):
                 self.logger.debug("version: %s", version)
 
             ret = self.__pre(args, root)
-            if ret != 0 and ret is not None:
+            if self.check_error(ret):
                 return ret
             return self.__run(args, root)
         except KeyboardInterrupt:
