@@ -13,16 +13,16 @@ from typing import Union
 CacheTimeUnit = Union[float, int]
 
 
-class CacheLookup(LookupError):
+class CacheLookupError(LookupError):
     pass
 
 
-class CacheMiss(CacheLookup):
+class CacheMiss(CacheLookupError):
     def __init__(self, name: Any):
         super().__init__(f"Not found {name} in cache")
 
 
-class CacheExpired(CacheLookup):
+class CacheExpired(CacheLookupError):
     def __init__(self, name: Optional[Any] = None):
         super().__init__("Cache expired" if name is None else f"Cache {name} expired")  # noqa:E501
 

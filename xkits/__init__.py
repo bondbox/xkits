@@ -11,7 +11,7 @@ from .cache import CacheAtom  # noqa:F401
 from .cache import CacheData  # noqa:F401
 from .cache import CacheExpired  # noqa:F401
 from .cache import CacheItem  # noqa:F401
-from .cache import CacheLookup  # noqa:F401
+from .cache import CacheLookupError  # noqa:F401
 from .cache import CacheMiss  # noqa:F401
 from .cache import CachePool  # noqa:F401
 from .cache import CacheTimeUnit  # noqa:F401
