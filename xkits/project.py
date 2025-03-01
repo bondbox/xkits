@@ -48,10 +48,10 @@ class project:
 
     def write(self, path: str, content: str) -> bool:
         if not os.path.exists(path) or self.allow_update:
-            with open(path, "w", encoding="utf-8") as hdl:
+            with open(path, "w", encoding="utf-8") as whdl:
                 if content[-1] != "\n":
                     content += "\n"
-                hdl.write(content)
+                whdl.write(content)
         return True
 
     def init_requirements(self):
@@ -61,6 +61,7 @@ class project:
         self.write(".coveragerc", f'''[run]
 omit =
     {self.folder}/unittest/*
+    {self.folder}/attribute.py
 
 [report]
 exclude_lines =
@@ -129,7 +130,10 @@ test-clean: pytest-clean
 
     def init_project(self):
         os.makedirs(self.folder, exist_ok=True)
+        os.makedirs(os.path.join(self.folder, "unittest"), exist_ok=True)
         self.write(os.path.join(self.folder, "__init__.py"),
+                   '''# coding:utf-8''')
+        self.write(os.path.join(self.folder, "unittest", "__init__.py"),
                    '''# coding:utf-8''')
         self.write(os.path.join(self.folder, "attribute.py"),
                    f'''# coding:utf-8
