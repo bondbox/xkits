@@ -33,5 +33,5 @@ setup(
     project_urls={"Source Code": __urlcode__,
                   "Bug Tracker": __urlbugs__,
                   "Documentation": __urldocs__},
-    packages=find_packages(include=["xkits*"], exclude=["tests"]),
+    packages=find_packages(include=["xkits*"], exclude=["xkits.unittest"]),
     install_requires=all_requirements())

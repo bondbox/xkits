@@ -249,9 +249,9 @@ setup(
     project_urls={{"Source Code": __urlcode__,
                   "Bug Tracker": __urlbugs__,
                   "Documentation": __urldocs__}},
-    packages=find_packages(include=["{self.folder}*"], exclude=["unittest"]),
+    packages=find_packages(include=["{self.folder}*"], exclude=["{self.folder}.unittest"]),
     install_requires=all_requirements())
-''')
+''')  # noqa:E501
 
     def create(self) -> int:
         self.init_requirements()
