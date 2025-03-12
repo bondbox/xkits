@@ -131,8 +131,7 @@ test-clean: pytest-clean
     def init_project(self):
         os.makedirs(self.folder, exist_ok=True)
         os.makedirs(os.path.join(self.folder, "unittest"), exist_ok=True)
-        self.write(os.path.join(self.folder, "__init__.py"),
-                   '''# coding:utf-8''')
+        self.write(os.path.join(self.folder, "__init__.py"), "")
         self.write(os.path.join(self.folder, "unittest", "__init__.py"), "")
         self.write(os.path.join(self.folder, "attribute.py"),
                    f'''# coding:utf-8
