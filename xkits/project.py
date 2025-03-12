@@ -49,7 +49,7 @@ class project:
     def write(self, path: str, content: str) -> bool:
         if not os.path.exists(path) or self.allow_update:
             with open(path, "w", encoding="utf-8") as whdl:
-                if content[-1] != "\n":
+                if len(content) > 0 and content[-1] != "\n":
                     content += "\n"
                 whdl.write(content)
         return True
