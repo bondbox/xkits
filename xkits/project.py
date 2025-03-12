@@ -161,10 +161,10 @@ from {__prog_name__} import argp
 from {__prog_name__} import commands
 from {__prog_name__} import run_command
 
-from .attribute import __description__
-from .attribute import __project__
-from .attribute import __urlhome__
-from .attribute import __version__
+from {self.folder}.attribute import __description__
+from {self.folder}.attribute import __project__
+from {self.folder}.attribute import __urlhome__
+from {self.folder}.attribute import __version__
 
 
 @add_command(__project__, description=__description__)
