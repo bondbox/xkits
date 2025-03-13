@@ -188,7 +188,7 @@ class ItemPool(Generic[IPKT, IPVT]):
         with self.__intlock:
             self.__pool[index] = item
 
-    def get(self, index: IPKT) -> CacheItem:
+    def get(self, index: IPKT) -> CacheItem[IPKT, IPVT]:
         with self.__intlock:
             try:
                 return self.__pool[index]
