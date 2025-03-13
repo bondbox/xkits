@@ -182,6 +182,10 @@ class ItemPool(Generic[IPKT, IPVT]):
     def lifetime(self) -> float:
         return self.__lifetime
 
+    @lifetime.setter
+    def lifetime(self, lifetime: CacheTimeUnit) -> None:
+        self.__lifetime = float(lifetime)
+
     def put(self, index: IPKT, value: IPVT, lifetime: Optional[CacheTimeUnit] = None) -> None:  # noqa:E501
         life = lifetime if lifetime is not None else self.lifetime
         item = CacheItem(index, value, life)
