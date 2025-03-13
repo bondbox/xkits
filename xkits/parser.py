@@ -2,7 +2,7 @@
 
 from argparse import ArgumentParser
 from argparse import Namespace
-from argparse import _ArgumentGroup
+from argparse import _ArgumentGroup  # noqa:H306
 from argparse import _HelpAction
 from argparse import _SubParsersAction
 from typing import Dict

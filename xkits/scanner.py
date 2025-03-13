@@ -8,7 +8,7 @@ from queue import Empty
 from queue import Queue
 import stat
 from threading import Thread
-from threading import current_thread
+from threading import current_thread  # noqa:H306
 from typing import Callable
 from typing import Dict
 from typing import Generator

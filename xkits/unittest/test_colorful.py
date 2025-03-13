@@ -5,7 +5,7 @@ import unittest
 from xkits import Back
 from xkits import Fore
 from xkits import Style
-from xkits import color
+from xkits import color  # noqa:H306
 from xkits import commands
 
 

@@ -5,7 +5,7 @@ from queue import Queue
 import sys
 from threading import Lock
 from threading import Thread
-from threading import current_thread
+from threading import current_thread  # noqa:H306
 from time import time
 from typing import Any
 from typing import Callable
@@ -18,7 +18,7 @@ from typing import Tuple
 from typing import TypeVar
 
 from .actuator import Logger
-from .actuator import commands
+from .actuator import commands  # noqa:H306
 
 LKIT = TypeVar("LKIT")
 LKNT = TypeVar("LKNT")

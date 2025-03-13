@@ -2,8 +2,9 @@
 
 import unittest
 
-from xkits import logger
 import mock
+
+from xkits import logger
 
 
 class test_log(unittest.TestCase):
