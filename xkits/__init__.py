@@ -1,7 +1,7 @@
 # coding:utf-8
 
 from .actuator import Namespace  # noqa:F401
-from .actuator import add_command  # noqa:F401
+from .actuator import add_command  # noqa:F401,H306
 from .actuator import cmds  # noqa:F401
 from .actuator import commands  # noqa:F401
 from .actuator import end_command  # noqa:F401
@@ -15,11 +15,12 @@ from .cache import CacheLookupError  # noqa:F401
 from .cache import CacheMiss  # noqa:F401
 from .cache import CachePool  # noqa:F401
 from .cache import CacheTimeUnit  # noqa:F401
+from .cache import ItemPool  # noqa:F401
 from .cache import NamedCache  # noqa:F401
 from .colorful import Back  # noqa:F401
 from .colorful import Fore  # noqa:F401
 from .colorful import Style  # noqa:F401
-from .colorful import color  # noqa:F401
+from .colorful import color  # noqa:F401,H306
 from .executor import hourglass  # noqa:F401
 from .parser import argp  # noqa:F401
 from .safefile import safile  # noqa:F401

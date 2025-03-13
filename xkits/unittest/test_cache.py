@@ -9,6 +9,7 @@ from xkits import CacheExpired
 from xkits import CacheItem
 from xkits import CacheMiss
 from xkits import CachePool
+from xkits import ItemPool
 from xkits import NamedCache
 
 
@@ -78,20 +79,20 @@ class test_cache(unittest.TestCase):
         item.data = "item"
         self.assertEqual(item.data, "item")
 
-    def test_cache_pool(self):
-        def read(pool: CachePool, name: str):
+    def test_item_pool(self):
+        def read(pool: ItemPool, name: str):
             return pool[name]
-        pool: CachePool[str, str] = CachePool()
+        pool: ItemPool[str, str] = ItemPool()
         pool[self.index] = self.value
         self.assertEqual(len(pool), 1)
-        self.assertEqual(pool[self.index], self.value)
+        self.assertEqual(pool[self.index].data, self.value)
         for key in pool:
-            self.assertIsInstance(pool[key], str)
+            self.assertIsInstance(pool[key], CacheItem)
         del pool[self.index]
         self.assertNotIn(self.index, pool)
         self.assertRaises(CacheMiss, read, pool, self.index)
         self.assertEqual(len(pool), 0)
-        self.assertEqual(str(pool), f"cache pool at {id(pool)}")
+        self.assertEqual(str(pool), f"cache item pool at {id(pool)}")
 
     def test_cache_pool_timeout(self):
         def read(pool: CachePool, name: str):
@@ -103,6 +104,7 @@ class test_cache(unittest.TestCase):
         self.assertEqual(len(pool), 1)
         self.assertRaises(CacheMiss, read, pool, self.index)
         self.assertEqual(len(pool), 0)
+        self.assertEqual(str(pool), f"cache pool at {id(pool)}")
 
 
 if __name__ == "__main__":

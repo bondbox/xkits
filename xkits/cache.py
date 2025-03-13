@@ -142,66 +142,85 @@ class CacheItem(NamedCache[CINT, CIDT]):
         super().update(data)
 
 
-CPIT = TypeVar("CPIT")
-CPVT = TypeVar("CPVT")
+IPKT = TypeVar("IPKT")
+IPVT = TypeVar("IPVT")
 
 
-class CachePool(Generic[CPIT, CPVT]):
-    '''Data cache pool'''
+class ItemPool(Generic[IPKT, IPVT]):
+    '''Cache item pool'''
 
     def __init__(self, lifetime: CacheTimeUnit = 0):
-        self.__pool: Dict[CPIT, CacheItem[CPIT, CPVT]] = {}
+        self.__pool: Dict[IPKT, CacheItem[IPKT, IPVT]] = {}
         self.__lifetime: float = float(lifetime)
         self.__intlock: Lock = Lock()  # internal lock
 
     def __str__(self) -> str:
-        return f"cache pool at {id(self)}"
+        return f"cache item pool at {id(self)}"
 
     def __len__(self) -> int:
         with self.__intlock:
             return len(self.__pool)
 
-    def __iter__(self) -> Iterator[CPIT]:
+    def __iter__(self) -> Iterator[IPKT]:
         with self.__intlock:
             return iter(self.__pool.keys())
 
-    def __contains__(self, index: CPIT) -> bool:
+    def __contains__(self, index: IPKT) -> bool:
         with self.__intlock:
             return index in self.__pool
 
-    def __setitem__(self, index: CPIT, value: CPVT) -> None:
+    def __setitem__(self, index: IPKT, value: IPVT) -> None:
         return self.put(index, value)
 
-    def __getitem__(self, index: CPIT) -> CPVT:
+    def __getitem__(self, index: IPKT) -> CacheItem:
         return self.get(index)
 
-    def __delitem__(self, index: CPIT) -> None:
+    def __delitem__(self, index: IPKT) -> None:
         return self.delete(index)
 
     @property
     def lifetime(self) -> float:
         return self.__lifetime
 
-    def put(self, index: CPIT, value: CPVT, lifetime: Optional[CacheTimeUnit] = None) -> None:  # noqa:E501
+    def put(self, index: IPKT, value: IPVT, lifetime: Optional[CacheTimeUnit] = None) -> None:  # noqa:E501
         life = lifetime if lifetime is not None else self.lifetime
         item = CacheItem(index, value, life)
         with self.__intlock:
             self.__pool[index] = item
 
-    def get(self, index: CPIT) -> CPVT:
+    def get(self, index: IPKT) -> CacheItem:
         with self.__intlock:
             try:
-                item = self.__pool[index]
-                data = item.data
-                return data
-            except CacheExpired as exc:
-                del self.__pool[index]
-                assert index not in self.__pool
-                raise CacheMiss(index) from exc
+                return self.__pool[index]
             except KeyError as exc:
                 raise CacheMiss(index) from exc
 
-    def delete(self, index: CPIT) -> None:
+    def delete(self, index: IPKT) -> None:
         with self.__intlock:
             if index in self.__pool:
                 del self.__pool[index]
+
+
+CPIT = TypeVar("CPIT")
+CPVT = TypeVar("CPVT")
+
+
+class CachePool(ItemPool[CPIT, CPVT]):
+    '''Named data cache pool'''
+
+    def __init__(self, lifetime: CacheTimeUnit = 0):
+        super().__init__(lifetime=lifetime)
+
+    def __str__(self) -> str:
+        return f"cache pool at {id(self)}"
+
+    def __getitem__(self, index: CPIT) -> CPVT:
+        return self.get(index)
+
+    def get(self, index: CPIT) -> CPVT:
+        try:
+            return super().get(index).data
+        except CacheExpired as exc:
+            super().delete(index)
+            assert index not in self
+            raise CacheMiss(index) from exc
