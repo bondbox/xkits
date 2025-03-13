@@ -1,6 +1,6 @@
 MAKEFLAGS += --always-make
 
-all: build install test
+all: build reinstall test
 
 
 clean-cover:

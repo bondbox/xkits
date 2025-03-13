@@ -84,7 +84,7 @@ disable=
     def init_makefile(self):
         self.write("Makefile", f'''MAKEFLAGS += --always-make
 
-all: build install test
+all: build reinstall test
 
 
 clean-cover:
