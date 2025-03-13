@@ -23,7 +23,7 @@ from xkits.attribute import __version__
 
 @add_command("debug", help="test logger level")
 def add_cmd_debug(_arg: argp):
-    commands().stdout("debug")
+    commands().stderr_red("debug")
     _arg.add_opt_on("-d", "--debug")
 
 
@@ -35,7 +35,7 @@ def run_cmd_debug(cmds: commands) -> int:
 
 @add_command("known", help="test preparse")
 def add_cmd_known(_arg: argp):
-    commands().stdout("known")
+    commands().stdout_green("known")
     _arg.preparse_from_sys_argv()
 
 
