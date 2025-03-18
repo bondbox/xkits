@@ -10,12 +10,12 @@ clean-tox:
 clean: build-clean test-clean clean-cover clean-tox
 
 
-upgrade-xpip.build:
-	pip3 install -i https://pypi.org/simple --upgrade xpip.build
-upgrade-xpip.upload:
-	pip3 install -i https://pypi.org/simple --upgrade xpip.upload
-upgrade-xpip: upgrade-xpip.build upgrade-xpip.upload
-	pip3 install -i https://pypi.org/simple --upgrade xpip.mirror
+upgrade-xpip-build:
+	pip3 install -i https://pypi.org/simple --upgrade xpip-build
+upgrade-xpip-upload:
+	pip3 install -i https://pypi.org/simple --upgrade xpip-upload
+upgrade-xpip: upgrade-xpip-build upgrade-xpip-upload
+	pip3 install -i https://pypi.org/simple --upgrade xpip-mirror
 
 
 upload:
