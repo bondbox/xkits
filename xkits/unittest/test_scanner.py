@@ -80,12 +80,6 @@ class test_scanner(unittest.TestCase):
             self.scanner.add(object)
             self.assertIs(self.scanner[path], object)
 
-    def test_add_file_object(self):
-        path = os.path.join("test", "requirements.txt")
-        object = scanner.object(path)
-        self.scanner.add(object)
-        self.assertIs(self.scanner[path], object)
-
 
 if __name__ == "__main__":
     unittest.main()
