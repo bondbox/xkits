@@ -20,15 +20,15 @@ from pip._internal.commands.show import _PackageInfo
 from pip._internal.commands.show import search_packages_info
 from tabulate import tabulate
 
-from .actuator import add_command
-from .actuator import commands
-from .actuator import run_command
-from .attribute import __prog_complete__
-from .attribute import __project__
-from .attribute import __urlhome__
-from .attribute import __version__
-from .parser import argp
-from .utils import singleton
+from xkits.actuator import add_command
+from xkits.actuator import commands
+from xkits.actuator import run_command
+from xkits.attribute import __prog_complete__
+from xkits.attribute import __project__
+from xkits.attribute import __urlhome__
+from xkits.attribute import __version__
+from xkits.parser import argp
+from xkits.utils import singleton
 
 USER_BASH_COMPLETION_CFG = "~/.bash_completion"
 USER_BASH_COMPLETION_DIR = "~/.bash_completion.d"

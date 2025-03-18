@@ -16,9 +16,9 @@ from bs4 import BeautifulSoup
 from requests import Response
 from requests import Session
 
-from .cache import CacheMiss
-from .cache import CachePool
-from .cache import CacheTimeUnit
+from xkits.cache import CacheMiss
+from xkits.cache import CachePool
+from xkits.cache import CacheTimeUnit
 
 SessionTimeUnit = Union[float, int]
 SessionTimeout = Optional[SessionTimeUnit]

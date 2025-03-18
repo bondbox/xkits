@@ -17,8 +17,8 @@ from typing import Set
 from typing import Tuple
 from typing import TypeVar
 
-from .actuator import Logger
-from .actuator import commands  # noqa:H306
+from xkits.actuator import Logger
+from xkits.actuator import commands  # noqa:H306
 
 LKIT = TypeVar("LKIT")
 LKNT = TypeVar("LKNT")

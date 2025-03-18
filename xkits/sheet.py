@@ -24,7 +24,7 @@ from wcwidth import wcswidth
 import xlrd
 import xlwt
 
-from .safefile import safile
+from xkits.safefile import safile
 
 FKT = TypeVar("FKT")
 FVT = TypeVar("FVT")

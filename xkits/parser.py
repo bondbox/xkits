@@ -12,8 +12,8 @@ from typing import Sequence
 from typing import Set
 from typing import Tuple
 
-from .attribute import __project__
-from .attribute import __urlhome__
+from xkits.attribute import __project__
+from xkits.attribute import __urlhome__
 
 try:
     from argcomplete import autocomplete

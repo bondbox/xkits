@@ -4,17 +4,17 @@ import os
 from typing import Optional
 from typing import Sequence
 
-from .actuator import add_command
-from .actuator import commands
-from .actuator import run_command
-from .attribute import __author__
-from .attribute import __author_email__
-from .attribute import __prog_name__
-from .attribute import __prog_project__
-from .attribute import __project__
-from .attribute import __urlhome__
-from .attribute import __version__
-from .parser import argp
+from xkits.actuator import add_command
+from xkits.actuator import commands
+from xkits.actuator import run_command
+from xkits.attribute import __author__
+from xkits.attribute import __author_email__
+from xkits.attribute import __prog_name__
+from xkits.attribute import __prog_project__
+from xkits.attribute import __project__
+from xkits.attribute import __urlhome__
+from xkits.attribute import __version__
+from xkits.parser import argp
 
 
 class project:

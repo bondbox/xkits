@@ -14,7 +14,7 @@ from typing import TextIO
 from colorlog import ColoredFormatter
 from colorlog.formatter import LogColors
 
-from .attribute import __prog_name__ as prog
+from xkits.attribute import __prog_name__ as prog
 
 
 class once_filter(logging.Filter):

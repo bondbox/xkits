@@ -17,7 +17,7 @@ from typing import Optional
 from typing import Sequence
 from typing import Set
 
-from .actuator import commands
+from xkits.actuator import commands
 
 CPU_COUNT = os.cpu_count()
 THDNUM_MINIMUM = 1

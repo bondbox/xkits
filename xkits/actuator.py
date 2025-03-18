@@ -16,11 +16,11 @@ from typing import Optional
 from typing import Sequence
 from typing import Tuple
 
-from .attribute import __prog_name__
-from .colorful import color
-from .logger import log
-from .parser import argp
-from .utils import singleton
+from xkits.attribute import __prog_name__
+from xkits.colorful import color
+from xkits.logger import log
+from xkits.parser import argp
+from xkits.utils import singleton
 
 
 class add_command:
