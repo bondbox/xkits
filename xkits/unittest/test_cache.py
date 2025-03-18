@@ -93,6 +93,8 @@ class test_cache(unittest.TestCase):
         self.assertRaises(CacheMiss, read, pool, self.index)
         self.assertEqual(len(pool), 0)
         self.assertEqual(str(pool), f"cache item pool at {id(pool)}")
+        pool.lifetime = 10000
+        self.assertEqual(pool.lifetime, 10000.0)
 
     def test_cache_pool_timeout(self):
         def read(pool: CachePool, name: str):
