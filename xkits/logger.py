@@ -65,8 +65,8 @@ class log:
         LOG_LEVELS.CRITICAL.name: "light_red",
         LOG_LEVELS.ERROR.name: "red",
         LOG_LEVELS.WARNING.name: "yellow",
-        LOG_LEVELS.INFO.name: "white",
-        LOG_LEVELS.DEBUG.name: "black",
+        LOG_LEVELS.INFO.name: "green",
+        LOG_LEVELS.DEBUG.name: "white",
     }
 
     def __init__(self):
