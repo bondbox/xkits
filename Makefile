@@ -1,5 +1,7 @@
 MAKEFLAGS += --always-make
 
+VERSION := $(shell python3 -c "from xkits.attribute import __version__; print(__version__)")
+
 all: build reinstall test
 
 
@@ -50,3 +52,7 @@ pytest-clean:
 	rm -rf .pytest_cache
 test: test-prepare pylint flake8 pytest
 test-clean: pytest-clean
+
+tag:
+	git tag -a v${VERSION} -m "release v${VERSION}"
+	git push origin --tags
