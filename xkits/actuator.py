@@ -7,6 +7,7 @@ from errno import ENOENT
 from errno import ENOTRECOVERABLE
 import logging
 from logging import Logger
+from os import getenv
 import sys
 from typing import Any
 from typing import Callable
@@ -452,15 +453,16 @@ class commands(log):
 
             option_level = filter_optional_name("--level", "--log-level")
             if isinstance(option_level, str):
+                DEF_LOG_LEVEL: str = getenv("LOG_LEVEL", self.LOG_LEVELS.INFO.value).lower()  # noqa:E501
                 group_level.add_argument(
                     option_level,
                     type=str,
                     nargs="?",
-                    const=self.LOG_LEVELS.INFO.value,
-                    default=self.LOG_LEVELS.INFO.value,
+                    const=DEF_LOG_LEVEL,
+                    default=DEF_LOG_LEVEL,
                     choices=self.ALLOWED_LOG_LEVELS,
                     dest="_log_level_str_",
-                    help="Logger output level, default info.")
+                    help=f"Logger output level, default is {DEF_LOG_LEVEL}.")
 
             for level in self.ALLOWED_LOG_LEVELS:
                 options = []
