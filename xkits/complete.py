@@ -144,12 +144,12 @@ def run_cmd_update(cmds: commands) -> int:
         iter_commands = collections().cmds
     for cmd in set(iter_commands):
         if shutil.which(cmd) is None:
-            cmds.stderr(f"Non existent command or script: {cmd}")
+            cmds.stderr_red(f"Non existent command or script: {cmd}")
             continue
         cmds.stdout(f"Update command or script: {cmd}")
         update_bash(cmd)
-    cmds.stdout("Please restart your shell or source the file to activate it.")
-    cmds.stdout(f"Bash: source {os.path.expanduser(USER_BASH_COMPLETION_CFG)}")
+    cmds.stdout_green("Please restart your shell or source the file to activate it.")  # noqa: E501
+    cmds.stdout_green(f"Bash: source {os.path.expanduser(USER_BASH_COMPLETION_CFG)}")  # noqa: E501
     return 0
 
 
