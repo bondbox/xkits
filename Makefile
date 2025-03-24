@@ -5,7 +5,7 @@ VERSION := $(shell python3 -c "from xkits.attribute import __version__; print(__
 all: build reinstall test
 
 
-release:
+release: all
 	git tag -a v${VERSION} -m "release v${VERSION}"
 	git push origin --tags
 

@@ -89,7 +89,7 @@ VERSION := $(shell python3 -c "from {self.folder}.attribute import __version__; 
 all: build reinstall test
 
 
-release:
+release: all
 	git tag -a v${{VERSION}} -m "release v${{VERSION}}"
 	git push origin --tags
 
