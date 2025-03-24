@@ -5,6 +5,11 @@ VERSION := $(shell python3 -c "from xkits.attribute import __version__; print(__
 all: build reinstall test
 
 
+release:
+	git tag -a v${VERSION} -m "release v${VERSION}"
+	git push origin --tags
+
+
 clean-cover:
 	rm -rf cover .coverage coverage.xml htmlcov
 clean-tox:
@@ -52,7 +57,3 @@ pytest-clean:
 	rm -rf .pytest_cache
 test: test-prepare pylint flake8 pytest
 test-clean: pytest-clean
-
-tag:
-	git tag -a v${VERSION} -m "release v${VERSION}"
-	git push origin --tags

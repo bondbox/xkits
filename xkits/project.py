@@ -84,7 +84,14 @@ disable=
     def init_makefile(self):
         self.write("Makefile", f'''MAKEFLAGS += --always-make
 
+VERSION := $(shell python3 -c "from {self.folder}.attribute import __version__; print(__version__)")
+
 all: build reinstall test
+
+
+release:
+	git tag -a v${{VERSION}} -m "release v${{VERSION}}"
+	git push origin --tags
 
 
 clean-cover:
