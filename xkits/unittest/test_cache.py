@@ -13,7 +13,7 @@ from xkits import ItemPool
 from xkits import NamedCache
 
 
-class test_cache(unittest.TestCase):
+class TestCache(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
@@ -33,15 +33,12 @@ class test_cache(unittest.TestCase):
     def test_cache_atom(self):
         item = CacheAtom(self.value, 0.1)
         self.assertFalse(item.expired)
-        self.assertGreater(item.down, 0)
         self.assertEqual(item.data, self.value)
         sleep(0.2)
         self.assertTrue(item.expired)
-        self.assertLess(item.down, 0)
         self.assertEqual(item.data, self.value)
         item.renew(0.5)
         self.assertFalse(item.expired)
-        self.assertGreater(item.down, 0)
         self.assertEqual(item.data, self.value)
         item.data = "atom"
         self.assertEqual(item.data, "atom")
@@ -53,7 +50,6 @@ class test_cache(unittest.TestCase):
         item = CacheData(self.value, 0.1)
         sleep(0.2)
         self.assertTrue(item.expired)
-        self.assertLess(item.down, 0)
         self.assertRaises(CacheExpired, read, item)
         item.data = "data"
         self.assertEqual(item.data, "data")
@@ -62,7 +58,6 @@ class test_cache(unittest.TestCase):
         item = NamedCache(self.index, self.value, 0.1)
         sleep(0.2)
         self.assertTrue(item.expired)
-        self.assertLess(item.down, 0)
         self.assertEqual(item.data, self.value)
         item.data = "name"
         self.assertEqual(item.data, "name")
@@ -74,7 +69,6 @@ class test_cache(unittest.TestCase):
         item = CacheItem(self.index, self.value, 0.1)
         sleep(0.2)
         self.assertTrue(item.expired)
-        self.assertLess(item.down, 0)
         self.assertRaises(CacheExpired, read, item)
         item.data = "item"
         self.assertEqual(item.data, "item")

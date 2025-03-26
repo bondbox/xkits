@@ -14,7 +14,6 @@ from xkits.cache import CacheItem  # noqa:F401
 from xkits.cache import CacheLookupError  # noqa:F401
 from xkits.cache import CacheMiss  # noqa:F401
 from xkits.cache import CachePool  # noqa:F401
-from xkits.cache import CacheTimeUnit  # noqa:F401
 from xkits.cache import ItemPool  # noqa:F401
 from xkits.cache import NamedCache  # noqa:F401
 from xkits.colorful import Back  # noqa:F401
@@ -24,6 +23,7 @@ from xkits.colorful import color  # noqa:F401,H306
 from xkits.executor import hourglass  # noqa:F401
 from xkits.meter import DownMeter  # noqa:F401
 from xkits.meter import TimeMeter  # noqa:F401
+from xkits.meter import TimeUnit  # noqa:F401
 from xkits.parser import argp  # noqa:F401
 from xkits.safefile import safile  # noqa:F401
 from xkits.safefile import stfile  # noqa:F401

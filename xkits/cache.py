@@ -1,16 +1,15 @@
 # coding:utf-8
 
 from threading import Lock
-from time import time
 from typing import Any
 from typing import Dict
 from typing import Generic
 from typing import Iterator
 from typing import Optional
 from typing import TypeVar
-from typing import Union
 
-CacheTimeUnit = Union[float, int]
+from xkits.meter import DownMeter
+from xkits.meter import TimeUnit
 
 
 class CacheLookupError(LookupError):
@@ -30,46 +29,15 @@ class CacheExpired(CacheLookupError):
 CADT = TypeVar("CADT")
 
 
-class CacheAtom(Generic[CADT]):
+class CacheAtom(DownMeter, Generic[CADT]):
     '''Data cache without name'''
 
-    def __init__(self, data: CADT, lifetime: CacheTimeUnit = 0):
-        self.__lifetime: float = float(lifetime)
-        self.__uptime: float = time()
+    def __init__(self, data: CADT, lifetime: TimeUnit = 0):
+        super().__init__(lifetime=lifetime)
         self.__data: CADT = data
 
     def __str__(self) -> str:
         return f"cache object at {id(self)}"
-
-    @property
-    def up(self) -> float:
-        '''uptime'''
-        return self.__uptime
-
-    @property
-    def age(self) -> float:
-        '''runtime'''
-        return time() - self.up
-
-    @property
-    def life(self) -> float:
-        '''lifetime'''
-        return self.__lifetime
-
-    @property
-    def down(self) -> float:
-        '''downtime'''
-        return self.life - self.age if self.life > 0.0 else 0.0
-
-    @property
-    def expired(self) -> bool:
-        return self.life > 0.0 and self.age > self.life
-
-    def renew(self, lifetime: Optional[CacheTimeUnit] = None) -> None:
-        '''renew uptime and lifetime(optional)'''
-        if lifetime is not None:
-            self.__lifetime = float(lifetime)
-        self.__uptime = time()
 
     def update(self, data: CADT) -> None:
         '''update cache data'''
@@ -109,7 +77,7 @@ NCDT = TypeVar("NCDT")
 class NamedCache(CacheAtom[NCDT], Generic[NCNT, NCDT]):
     '''Named data cache'''
 
-    def __init__(self, name: NCNT, data: NCDT, lifetime: CacheTimeUnit = 0):
+    def __init__(self, name: NCNT, data: NCDT, lifetime: TimeUnit = 0):
         super().__init__(data, lifetime)
         self.__name: NCNT = name
 
@@ -128,7 +96,7 @@ CIDT = TypeVar("CIDT")
 class CacheItem(NamedCache[CINT, CIDT]):
     '''Named data cache with enforces expiration check'''
 
-    def __init__(self, name: CINT, data: CIDT, lifetime: CacheTimeUnit = 0):
+    def __init__(self, name: CINT, data: CIDT, lifetime: TimeUnit = 0):
         super().__init__(name, data, lifetime)
 
     @property
@@ -149,7 +117,7 @@ IPVT = TypeVar("IPVT")
 class ItemPool(Generic[IPKT, IPVT]):
     '''Cache item pool'''
 
-    def __init__(self, lifetime: CacheTimeUnit = 0):
+    def __init__(self, lifetime: TimeUnit = 0):
         self.__pool: Dict[IPKT, CacheItem[IPKT, IPVT]] = {}
         self.__lifetime: float = float(lifetime)
         self.__intlock: Lock = Lock()  # internal lock
@@ -183,10 +151,10 @@ class ItemPool(Generic[IPKT, IPVT]):
         return self.__lifetime
 
     @lifetime.setter
-    def lifetime(self, lifetime: CacheTimeUnit) -> None:
+    def lifetime(self, lifetime: TimeUnit) -> None:
         self.__lifetime = float(lifetime)
 
-    def put(self, index: IPKT, value: IPVT, lifetime: Optional[CacheTimeUnit] = None) -> None:  # noqa:E501
+    def put(self, index: IPKT, value: IPVT, lifetime: Optional[TimeUnit] = None) -> None:  # noqa:E501
         life = lifetime if lifetime is not None else self.lifetime
         item = CacheItem(index, value, life)
         with self.__intlock:
@@ -212,7 +180,7 @@ CPVT = TypeVar("CPVT")
 class CachePool(ItemPool[CPIT, CPVT]):
     '''Named data cache pool'''
 
-    def __init__(self, lifetime: CacheTimeUnit = 0):
+    def __init__(self, lifetime: TimeUnit = 0):
         super().__init__(lifetime=lifetime)
 
     def __str__(self) -> str:

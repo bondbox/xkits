@@ -18,7 +18,7 @@ from requests import Session
 
 from xkits.cache import CacheMiss
 from xkits.cache import CachePool
-from xkits.cache import CacheTimeUnit
+from xkits.meter import TimeUnit
 
 SessionTimeUnit = Union[float, int]
 SessionTimeout = Optional[SessionTimeUnit]
@@ -123,7 +123,7 @@ class PageCache(CachePool[str, Page]):
     '''Website pages cache pool'''
 
     def __init__(self, session: Optional[Session] = None,
-                 lifetime: CacheTimeUnit = 0):
+                 lifetime: TimeUnit = 0):
         self.__session: Optional[Session] = session
         super().__init__(lifetime=lifetime)
 
@@ -152,7 +152,7 @@ class Site(PageCache):
     '''Website with pages cache pool'''
 
     def __init__(self, base: str, session: Optional[Session] = None,
-                 lifetime: CacheTimeUnit = 0):
+                 lifetime: TimeUnit = 0):
         super().__init__(session=session, lifetime=lifetime)
         components: ParseResult = urlparse(url=base)
         self.__baseurl: str = urlunparse(components)
