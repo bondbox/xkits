@@ -38,7 +38,8 @@ class add_command:
     '''
 
     def __init__(self, name: str, **kwargs):
-        '''
+        '''Initialize the node.
+
         @param name: Node name
         @type name: str
 
@@ -151,7 +152,8 @@ class run_command:
 
     def __init__(self, cmd_bind: add_command, *sub_cmds: add_command,
                  skip: bool = False):
-        '''
+        '''Initialize the node.
+
         @param cmd_bind: Bind to a root command node
         @type name: add_command
 
@@ -232,7 +234,8 @@ class pre_command:
     '''
 
     def __init__(self, run_bind: run_command):
-        '''
+        '''Initialize the node.
+
         @param cmd_bind: Bind to a root command node
         @type name: add_command
         '''
@@ -275,7 +278,8 @@ class end_command:
     '''
 
     def __init__(self, run_bind: run_command):
-        '''
+        '''Initialize the node.
+
         @param cmd_bind: Bind to a root command node
         @type name: add_command
         '''
@@ -357,8 +361,7 @@ class commands(log):
 
     @property
     def root(self) -> Optional[add_command]:
-        '''Root Command.
-        '''
+        '''Root Command.'''
         return self.__root
 
     @root.setter
@@ -368,8 +371,7 @@ class commands(log):
 
     @property
     def args(self) -> Namespace:
-        '''Namespace after parse arguments.
-        '''
+        '''Namespace after parse arguments.'''
         assert isinstance(self.__args, Namespace)
         return self.__args
 
@@ -380,8 +382,7 @@ class commands(log):
 
     @property
     def version(self) -> Optional[str]:
-        '''Custom version for "-v" or "--version" output.
-        '''
+        '''Custom version for "-v" or "--version" output.'''
         return self.__version
 
     @version.setter
@@ -401,30 +402,25 @@ class commands(log):
 
     @property
     def logger(self) -> Logger:
-        '''Logger.
-        '''
+        '''Logger.'''
         return self.get_logger(self.prog)
 
     def stdout(self, context: Any):
-        '''Output string to sys.stdout.
-        '''
+        '''Output string to sys.stdout.'''
         sys.stdout.write(f"{context}\n")
         sys.stdout.flush()
 
     def stdout_green(self, context: Any):
-        '''Output string to sys.stdout with green color.
-        '''
+        '''Output string to sys.stdout with green color.'''
         self.stdout(color.green(context))
 
     def stderr(self, context: Any):
-        '''Output string to sys.stderr.
-        '''
+        '''Output string to sys.stderr.'''
         sys.stderr.write(f"{context}\n")
         sys.stderr.flush()
 
     def stderr_red(self, context: Any):
-        '''Output string to sys.stderr with red color.
-        '''
+        '''Output string to sys.stderr with red color.'''
         self.stderr(color.red(context))
 
     def __add_optional_version(self, _arg: argp):
@@ -612,8 +608,7 @@ class commands(log):
 
     def parse(self, root: Optional[add_command] = None,
               argv: Optional[Sequence[str]] = None, **kwargs) -> Namespace:
-        '''Parse the command line.
-        '''
+        '''Parse the command line.'''
         if root is None:
             root = self.root
         assert isinstance(root, add_command)
@@ -707,8 +702,7 @@ class commands(log):
             root: Optional[add_command] = None,
             argv: Optional[Sequence[str]] = None,
             **kwargs) -> int:
-        '''Parse and run the command line.
-        '''
+        '''Parse and run the command line.'''
         if root is None:
             root = self.root
 

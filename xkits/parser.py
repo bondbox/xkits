@@ -27,8 +27,7 @@ class checker():
 
     @classmethod
     def check_name_pos(cls, fn):
-        '''check positional argument name
-        '''
+        '''check positional argument name'''
 
         def inner(self, name: str, **kwargs):
             assert isinstance(name, str) and name[0] not in cls.prefix_chars, \
@@ -39,8 +38,7 @@ class checker():
 
     @classmethod
     def check_name_opt(cls, fn):
-        '''check optional argument name
-        '''
+        '''check optional argument name'''
 
         def inner(self, *name: str, **kwargs):
             # 1. check short form optional argument ("-x")
@@ -75,8 +73,7 @@ class checker():
 
 
 class argp(ArgumentParser):
-    '''Simple command-line tool based on argparse.
-    '''
+    '''Simple command-line tool based on argparse.'''
 
     def __init__(self,  # pylint: disable=R0913,R0917
                  argv: Optional[Sequence[str]] = None,
@@ -122,8 +119,7 @@ class argp(ArgumentParser):
                        title: Optional[str] = None,
                        description: Optional[str] = None,
                        **kwargs) -> _ArgumentGroup:
-        '''Find the created argument group by title, create if not exist.
-        '''
+        '''Find the created argument group by title, create if not exist.'''
         for group in self._action_groups:
             if title == group.title:
                 return group
@@ -131,8 +127,7 @@ class argp(ArgumentParser):
 
     @checker.check_name_opt
     def filter_optional_name(self, *name: str) -> Sequence[str]:
-        '''Filter defined optional argument name.
-        '''
+        '''Filter defined optional argument name.'''
         option_strings: Set[str] = set()
         for action in self._get_optional_actions():
             option_strings.update(action.option_strings)
@@ -140,8 +135,7 @@ class argp(ArgumentParser):
 
     @checker.check_name_pos
     def add_pos(self, name: str, **kwargs) -> None:
-        '''Add positional argument.
-        '''
+        '''Add positional argument.'''
         assert "dest" not in kwargs, \
             "dest supplied twice for positional argument"
         self.add_argument(name, **kwargs)
@@ -149,14 +143,12 @@ class argp(ArgumentParser):
     @checker.check_name_opt
     @checker.check_nargs_opt
     def add_opt(self, *name: str, **kwargs) -> None:
-        '''Add optional argument.
-        '''
+        '''Add optional argument.'''
         self.add_argument(*name, **kwargs)
 
     @checker.check_name_opt
     def add_opt_on(self, *name: str, **kwargs) -> None:
-        '''Add boolean optional argument, default value is False.
-        '''
+        '''Add boolean optional argument, default value is False.'''
         kwargs.update({"action": "store_true"})
         for key in ("type", "nargs", "const", "default", "choices"):
             assert key not in kwargs, f"'{key}' is an invalid argument"
@@ -164,16 +156,14 @@ class argp(ArgumentParser):
 
     @checker.check_name_opt
     def add_opt_off(self, *name: str, **kwargs) -> None:
-        '''Add boolean optional argument, default value is True.
-        '''
+        '''Add boolean optional argument, default value is True.'''
         kwargs.update({"action": "store_false"})
         for key in ("type", "nargs", "const", "default", "choices"):
             assert key not in kwargs, f"'{key}' is an invalid argument"
         self.add_argument(*name, **kwargs)
 
     def add_subparsers(self, *args, **kwargs) -> _SubParsersAction:
-        '''Add subparsers.
-        '''
+        '''Add subparsers.'''
         # subparser: cannot have multiple subparser arguments
         kwargs.setdefault("title", "subcommands")
         kwargs.setdefault("description", None)

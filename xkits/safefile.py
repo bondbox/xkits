@@ -27,38 +27,32 @@ class stfile:
 
     @property
     def stat(self) -> os.stat_result:
-        '''file stat
-        '''
+        '''file stat'''
         return os.stat(self.path)
 
     @property
     def uid(self) -> int:
-        '''file uid
-        '''
+        '''file uid'''
         return self.stat.st_uid
 
     @uid.setter
     def uid(self, uid: int):
-        '''change file uid
-        '''
+        '''change file uid'''
         os.chown(self.path, uid, -1)
 
     @property
     def gid(self) -> int:
-        '''file gid
-        '''
+        '''file gid'''
         return self.stat.st_gid
 
     @gid.setter
     def gid(self, gid: int):
-        '''change file gid
-        '''
+        '''change file gid'''
         os.chown(self.path, -1, gid)
 
     @property
     def username(self) -> str:
-        '''file owner
-        '''
+        '''file owner'''
         try:
             return getpwuid(self.uid).pw_name
         except KeyError:  # pragma: no cover
@@ -66,14 +60,12 @@ class stfile:
 
     @username.setter
     def username(self, owner: Union[int, str]):
-        '''change file owner
-        '''
+        '''change file owner'''
         self.uid = getpwnam(owner).pw_uid if isinstance(owner, str) else owner
 
     @property
     def groupname(self) -> str:
-        '''file group
-        '''
+        '''file group'''
         try:
             return getgrgid(self.gid).gr_name
         except KeyError:  # pragma: no cover
@@ -81,19 +73,16 @@ class stfile:
 
     @groupname.setter
     def groupname(self, group: Union[int, str]):
-        '''change file group
-        '''
+        '''change file group'''
         self.gid = getgrnam(group).gr_gid if isinstance(group, str) else group
 
     def chown(self, owner: Union[int, str], group: Union[int, str] = -1):
-        '''change file owner and group
-        '''
+        '''change file owner and group'''
         self.username = int(owner) if isinstance(owner, str) and owner.isdigit() else owner  # noqa:E501
         self.groupname = int(group) if isinstance(group, str) and group.isdigit() else group  # noqa:E501
 
     def chgrp(self, group: Union[int, str]):
-        '''change group ownership
-        '''
+        '''change group ownership'''
         self.groupname = int(group) if isinstance(group, str) and group.isdigit() else group  # noqa:E501
 
     @property
@@ -223,8 +212,7 @@ class stfile:
         return self.human_all_permissions[6:9]
 
     def chmod(self, mode: Union[int, str]):
-        '''change file mode bits
-        '''
+        '''change file mode bits'''
         if isinstance(mode, str):
             mode = int(mode, 8)
         os.chmod(self.path, mode)
@@ -238,14 +226,12 @@ class safile:
 
     @classmethod
     def lock(cls, origin: str):
-        '''Unified file lock
-        '''
+        '''Unified file lock'''
         return FileLock(f"{origin}.lock")
 
     @classmethod
     def get_backup_path(cls, origin: str) -> str:
-        '''Unified backup path
-        '''
+        '''Unified backup path'''
         return f"{origin}.bak"
 
     @classmethod
@@ -272,8 +258,7 @@ class safile:
 
     @classmethod
     def delete_backup(cls, path: str) -> bool:
-        '''Delete backup after writing file
-        '''
+        '''Delete backup after writing file'''
         pbak: str = cls.get_backup_path(path)
         if os.path.isfile(pbak):
             os.remove(pbak)
@@ -281,8 +266,7 @@ class safile:
 
     @classmethod
     def restore(cls, path: str) -> bool:
-        '''Restore (if backup exists) before reading file
-        '''
+        '''Restore (if backup exists) before reading file'''
         pbak: str = cls.get_backup_path(path)
         if os.path.isfile(pbak):
             if os.path.isfile(path):
