@@ -19,6 +19,8 @@ from typing import TypeVar
 
 from xkits.actuator import Logger
 from xkits.actuator import commands  # noqa:H306
+from xkits.meter import TimeMeter
+from xkits.meter import TimeUnit
 
 LKIT = TypeVar("LKIT")
 LKNT = TypeVar("LKNT")
@@ -181,6 +183,30 @@ class TaskJob():  # pylint: disable=too-many-instance-attributes
             self.__stopped = time()
 
 
+class DelayTaskJob(TaskJob):  # pylint: disable=too-many-instance-attributes
+    '''Delay Task Job'''
+
+    def __init__(self, delay: TimeUnit, no: int, fn: Callable, *args: Any, **kwargs: Any):  # noqa:E501
+        self.__timer: TimeMeter = TimeMeter(start=True)
+        self.__delay: float = float(max(delay, 1.0))
+        super().__init__(no, fn, *args, **kwargs)
+
+    @property
+    def timer(self) -> TimeMeter:
+        '''job timer'''
+        return self.__timer
+
+    @property
+    def delay(self) -> float:
+        '''job delay time'''
+        return self.__delay
+
+    def run(self) -> bool:
+        '''run job'''
+        self.timer.alarm(self.delay)
+        return super().run()
+
+
 if sys.version_info >= (3, 9):
     JobQueue = Queue[Optional[TaskJob]]  # noqa: E501, pragma: no cover, pylint: disable=unsubscriptable-object
 else:  # Python3.8 TypeError
@@ -281,16 +307,15 @@ class TaskPool(Dict[int, TaskJob]):  # noqa: E501, pylint: disable=too-many-inst
                      )
 
     def submit(self, fn: Callable, *args: Any, **kwargs: Any) -> TaskJob:
-        '''submit a task to jobs queue
+        return self.submit_delay_task(0.0, fn, *args, **kwargs)
 
-        Returns:
-            int: job id
-        '''
+    def submit_delay_task(self, delay: TimeUnit, fn: Callable, *args: Any, **kwargs: Any) -> TaskJob:  # noqa:E501
+        '''submit a task to jobs queue'''
         sn: int  # serial number
         with self.__intlock:  # generate job id under lock protection
             self.__counter += 1
             sn = self.__counter
-        job: TaskJob = TaskJob(sn, fn, *args, **kwargs)
+        job: TaskJob = DelayTaskJob(delay, sn, fn, *args, **kwargs) if delay > 0.0 else TaskJob(sn, fn, *args, **kwargs)  # noqa:E501
         self.jobs.put(job, block=True)
         self.setdefault(sn, job)
         assert self[sn] is job

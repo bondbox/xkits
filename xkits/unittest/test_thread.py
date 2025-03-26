@@ -3,6 +3,7 @@
 from time import time
 import unittest
 
+from xkits import DelayTaskJob
 from xkits import NamedLock
 from xkits import TaskJob
 from xkits import TaskPool
@@ -53,12 +54,21 @@ class test_thread_pool(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def test_init(self):
-        pool: ThreadPool = ThreadPool(1)
-        pool.cmds.stdout("unittest")
-        self.assertIsInstance(pool.alive_threads, set)
-        self.assertIsInstance(pool.other_threads, set)
-        self.assertIsInstance(pool.other_alive_threads, set)
+    def test_join(self):
+        def handle() -> bool:
+            return True
+
+        with ThreadPool(1) as pool:
+            pool.submit(handle)
+            pool.submit(handle)
+            pool.submit(handle)
+            pool.submit(handle)
+            pool.submit(handle)
+            pool.cmds.stdout("unittest")
+            self.assertIsInstance(pool.alive_threads, set)
+            self.assertIsInstance(pool.other_threads, set)
+            self.assertIsInstance(pool.other_alive_threads, set)
+            pool.shutdown()
 
 
 class test_task_pool(unittest.TestCase):
@@ -84,7 +94,7 @@ class test_task_pool(unittest.TestCase):
         def result(job: TaskJob):
             return job.result
 
-        job: TaskJob = TaskJob(1, handle, False)
+        job: TaskJob = DelayTaskJob(1.0, 1, handle, False)
         self.assertRaises(LookupError, result, job)
         self.assertLess(job.created, time())
         self.assertEqual(job.started, 0.0)

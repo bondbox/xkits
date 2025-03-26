@@ -41,6 +41,7 @@ from xkits.sitepage import PageCache  # noqa:F401
 from xkits.sitepage import ProxyProtocol  # noqa:F401
 from xkits.sitepage import ProxySession  # noqa:F401
 from xkits.sitepage import Site  # noqa:F401
+from xkits.thread import DelayTaskJob  # noqa:F401
 from xkits.thread import NamedLock  # noqa:F401
 from xkits.thread import TaskJob  # noqa:F401
 from xkits.thread import TaskPool  # noqa:F401
