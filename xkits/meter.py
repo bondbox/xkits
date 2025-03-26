@@ -78,4 +78,4 @@ class DownMeter(TimeMeter):
         self.restart()
 
     def shutdown(self):
-        raise NotImplementedError("DownMeter cannot shutdown")
+        raise RuntimeError("DownMeter cannot shutdown")

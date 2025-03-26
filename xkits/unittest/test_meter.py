@@ -198,6 +198,18 @@ class TestDownMeter(unittest.TestCase):
         self.assertEqual(countdown.lifetime, 2.0)
         self.assertEqual(countdown.downtime, 1.0)
 
+    @mock.patch.object(meter, "time")
+    def test_shutdown(self, mock_time):
+        mock_time.side_effect = [1.0, 2.0, 3.0]
+        countdown = meter.DownMeter(lifetime=3)
+        self.assertEqual(countdown.created_time, 1.0)
+        self.assertEqual(countdown.started_time, 1.0)
+        self.assertEqual(countdown.stopped_time, 0.0)
+        self.assertEqual(countdown.lifetime, 3.0)
+        self.assertEqual(countdown.downtime, 2.0)
+        self.assertEqual(countdown.downtime, 1.0)
+        self.assertRaises(RuntimeError, countdown.shutdown)
+
 
 if __name__ == "__main__":
     unittest.main()
