@@ -6,7 +6,6 @@ import sys
 from threading import Lock
 from threading import Thread
 from threading import current_thread  # noqa:H306
-from time import time
 from typing import Any
 from typing import Callable
 from typing import Dict
@@ -108,7 +107,7 @@ class ThreadPool(ThreadPoolExecutor):
         return {thread for thread in self.other_threads if thread.is_alive()}
 
 
-class TaskJob():  # pylint: disable=too-many-instance-attributes
+class TaskJob(TimeMeter):  # pylint: disable=too-many-instance-attributes
     '''Task Job'''
 
     def __init__(self, no: int, fn: Callable, *args: Any, **kwargs: Any):
@@ -117,9 +116,7 @@ class TaskJob():  # pylint: disable=too-many-instance-attributes
         self.__args: Tuple[Any, ...] = args
         self.__kwargs: Dict[str, Any] = kwargs
         self.__result: Any = LookupError(f"Job{no} is not started")
-        self.__created: float = time()
-        self.__started: float = 0.0
-        self.__stopped: float = 0.0
+        super().__init__(start=False)
 
     def __str__(self) -> str:
         args = list(self.args) + list(f"{k}={v}" for k, v in self.kwargs)
@@ -153,34 +150,20 @@ class TaskJob():  # pylint: disable=too-many-instance-attributes
             raise self.__result
         return self.__result
 
-    @property
-    def created(self) -> float:
-        '''job created time'''
-        return self.__created
-
-    @property
-    def started(self) -> float:
-        '''job started time'''
-        return self.__started
-
-    @property
-    def stopped(self) -> float:
-        '''job stopped time'''
-        return self.__stopped
-
     def run(self) -> bool:
         '''run job'''
         try:
-            if self.__started > 0.0:
+            if self.started:
                 raise RuntimeError(f"{self} is already started")
-            self.__started = time()
+            self.startup()
+            assert self.started
             self.__result = self.fn(*self.args, **self.kwargs)
             return True
         except Exception as error:  # pylint: disable=broad-exception-caught
             self.__result = error
             return False
         finally:
-            self.__stopped = time()
+            self.shutdown()
 
 
 class DelayTaskJob(TaskJob):  # pylint: disable=too-many-instance-attributes
