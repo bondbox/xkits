@@ -29,11 +29,17 @@ class TimeMeter():
 
     @property
     def runtime(self) -> float:
-        return time() - self.started_time if self.started_time > 0.0 else 0.0
+        return (self.stopped_time or time()) - self.started_time if self.started_time > 0.0 else 0.0  # noqa:E501
 
     @property
     def started(self) -> bool:
+        '''running and not stopped'''
         return self.started_time > 0.0 and self.stopped_time == 0.0
+
+    @property
+    def stopped(self) -> bool:
+        '''started and stopped'''
+        return self.started_time > 0.0 and self.stopped_time > 0.0
 
     def restart(self):
         self.__started = time()
@@ -41,7 +47,7 @@ class TimeMeter():
 
     def startup(self):
         if not self.started:
-            self.__started = time()
+            self.restart()
 
     def shutdown(self):
         if self.started:
