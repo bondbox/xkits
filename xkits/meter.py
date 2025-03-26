@@ -1,5 +1,6 @@
 # coding:utf-8
 
+from time import sleep
 from time import time
 from typing import Optional
 from typing import Union
@@ -46,13 +47,25 @@ class TimeMeter():
         if self.started:
             self.__stopped = time()
 
+    def clock(self, delay: TimeUnit = 1.0):
+        '''sleep for a while'''
+        if self.started and delay > 0.0:
+            sleep(delay)
+
+    def alarm(self, endtime: TimeUnit):
+        '''sleep until endtime'''
+        if not self.started:
+            self.startup()
+        while (delta := endtime - self.runtime) > 0.0:
+            self.clock(delta)
+
     def reset(self):
         self.__started = 0.0
         self.__stopped = 0.0
 
 
 class DownMeter(TimeMeter):
-    def __init__(self, lifetime: TimeUnit = 0):
+    def __init__(self, lifetime: TimeUnit = 0.0):
         self.__lifetime: float = max(float(lifetime), 0.0)
         super().__init__(start=True)
 
