@@ -102,6 +102,7 @@ class test_task_pool(unittest.TestCase):
         self.assertEqual(job.id, 1)
         self.assertTrue(job.run())
         self.assertFalse(job.result)
+        self.assertIsNone(job.renew(1.0))
         self.assertLess(job.created, time())
         self.assertLess(job.started, time())
         self.assertLess(job.stopped, time())

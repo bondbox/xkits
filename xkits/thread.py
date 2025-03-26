@@ -201,6 +201,12 @@ class DelayTaskJob(TaskJob):  # pylint: disable=too-many-instance-attributes
         '''job delay time'''
         return self.__delay
 
+    def renew(self, delay: Optional[TimeUnit] = None) -> None:
+        '''renew delay time'''
+        if delay is not None:
+            self.__delay = float(max(delay, 1.0))
+        self.timer.restart()
+
     def run(self) -> bool:
         '''run job'''
         self.timer.alarm(self.delay)
