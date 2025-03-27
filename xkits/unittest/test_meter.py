@@ -243,5 +243,85 @@ class TestDownMeter(unittest.TestCase):
         self.assertRaises(RuntimeError, countdown.shutdown)
 
 
+class TestTsCountMeter(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        pass
+
+    @classmethod
+    def tearDownClass(cls):
+        pass
+
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def test_CountMeter_str(self):
+        counter = meter.CountMeter()
+        self.assertEqual(str(counter), f"CountMeter({id(counter)})")
+
+    def test_StatusCountMeter(self):
+        counter = meter.StatusCountMeter()
+        self.assertEqual(str(counter), f"StatusCountMeter({id(counter)})")
+        self.assertEqual(counter.total, 0)
+        self.assertEqual(counter.success, 0)
+        self.assertEqual(counter.failure, 0)
+        counter.inc()
+        self.assertEqual(counter.total, 1)
+        self.assertEqual(counter.success, 1)
+        self.assertEqual(counter.failure, 0)
+        counter.inc(True)
+        self.assertEqual(counter.total, 2)
+        self.assertEqual(counter.success, 2)
+        self.assertEqual(counter.failure, 0)
+        counter.inc(False)
+        self.assertEqual(counter.total, 3)
+        self.assertEqual(counter.success, 2)
+        self.assertEqual(counter.failure, 1)
+        counter.dec()
+        self.assertEqual(counter.total, 4)
+        self.assertEqual(counter.success, 2)
+        self.assertEqual(counter.failure, 2)
+
+    def test_add(self):
+        counter = meter.TsCountMeter()
+        self.assertEqual(counter.total, 0)
+        self.assertEqual(counter.updated_time, 0.0)
+        self.assertLessEqual(counter.created_time, meter.time())
+        self.assertRaises(ValueError, counter.inc, 0)
+        self.assertEqual(counter.updated_time, 0.0)
+        self.assertEqual(counter.total, 0)
+        self.assertEqual(counter.inc(1), 1)
+        self.assertEqual(counter.total, 1)
+        self.assertGreaterEqual(counter.updated_time, counter.created_time)
+        self.assertRaises(RuntimeError, counter.dec, 1)
+        self.assertEqual(counter.total, 1)
+        self.assertEqual(counter.inc(2), 3)
+        self.assertEqual(counter.total, 3)
+
+    def test_sub(self):
+        counter = meter.TsCountMeter(allow_sub=True)
+        self.assertEqual(counter.total, 0)
+        self.assertEqual(counter.updated_time, 0.0)
+        self.assertLessEqual(counter.created_time, meter.time())
+        self.assertRaises(ValueError, counter.dec, 0)
+        self.assertEqual(counter.updated_time, 0.0)
+        self.assertEqual(counter.total, 0)
+        self.assertEqual(counter.inc(10), 10)
+        self.assertEqual(counter.total, 10)
+        self.assertGreaterEqual(counter.updated_time, counter.created_time)
+        self.assertEqual(counter.dec(2), 8)
+        self.assertEqual(counter.total, 8)
+        self.assertEqual(counter.dec(5), 3)
+        self.assertEqual(counter.total, 3)
+        self.assertEqual(counter.dec(8), -5)
+        self.assertEqual(counter.total, -5)
+        self.assertRaises(ValueError, counter.dec, -1)
+        self.assertEqual(counter.total, -5)
+
+
 if __name__ == "__main__":
     unittest.main()
