@@ -94,14 +94,16 @@ class test_task_pool(unittest.TestCase):
         def result(job: TaskJob):
             return job.result
 
-        job: TaskJob = DelayTaskJob(1.0, 1, handle, False)
+        self.assertIsInstance(DelayTaskJob.create_task(handle, False), TaskJob)
+        job: DelayTaskJob = DelayTaskJob.create_delay_task(1.0, handle, False)
+        self.assertIsInstance(job, DelayTaskJob)
         self.assertRaises(LookupError, result, job)
         self.assertLess(job.created_time, time())
         self.assertEqual(job.started_time, 0.0)
         self.assertEqual(job.stopped_time, 0.0)
         self.assertFalse(job.started)
         self.assertFalse(job.stopped)
-        self.assertEqual(job.id, 1)
+        self.assertEqual(job.id, -1)
         self.assertTrue(job.run())
         self.assertFalse(job.result)
         self.assertIsNone(job.renew(1.0))

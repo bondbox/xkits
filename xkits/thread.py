@@ -118,6 +118,10 @@ class TaskJob(TimeMeter):  # pylint: disable=too-many-instance-attributes
         self.__result: Any = LookupError(f"Job{no} is not started")
         super().__init__(start=False)
 
+    @classmethod
+    def create_task(cls, fn: Callable, *args: Any, **kwargs: Any) -> "TaskJob":
+        return cls(-1, fn, *args, **kwargs)
+
     def __str__(self) -> str:
         args = list(self.args) + list(f"{k}={v}" for k, v in self.kwargs)
         info: str = ", ".join(f"{a}" for a in args)
@@ -173,6 +177,10 @@ class DelayTaskJob(TaskJob):  # pylint: disable=too-many-instance-attributes
         self.__timer: TimeMeter = TimeMeter(start=True)
         self.__delay: float = float(max(delay, 1.0))
         super().__init__(no, fn, *args, **kwargs)
+
+    @classmethod
+    def create_delay_task(cls, delay: TimeUnit, fn: Callable, *args: Any, **kwargs: Any) -> "DelayTaskJob":  # noqa:E501
+        return cls(delay, -1, fn, *args, **kwargs)
 
     @property
     def timer(self) -> TimeMeter:
