@@ -124,12 +124,15 @@ class test_task_pool(unittest.TestCase):
             if index % 2 == 1:
                 raise Exception(f"task{index}")
         with TaskPool(8) as tasker:
-            for index in range(15):
-                tasker.submit(lock, tasker, index)
+            tasker.submit_job(TaskJob(123456, lock, tasker, 0))
+            tasker.submit_delay_task(0.01, lock, tasker, 1)
+            tasker.submit_delay_task(0.01, lock, tasker, 2)
+            tasker.submit_task(lock, tasker, 3)
+            tasker.submit_task(lock, tasker, 4)
             tasker.barrier()
-            self.assertEqual(tasker.status_counter.total, 15)
-            self.assertEqual(tasker.status_counter.success, 8)
-            self.assertEqual(tasker.status_counter.failure, 7)
+            self.assertEqual(tasker.status_counter.total, 5)
+            self.assertEqual(tasker.status_counter.success, 3)
+            self.assertEqual(tasker.status_counter.failure, 2)
             self.assertTrue(tasker.running)
             tasker.shutdown()
             self.assertFalse(tasker.running)

@@ -294,19 +294,25 @@ class TaskPool(Dict[int, TaskJob]):  # noqa: E501, pylint: disable=too-many-inst
         logger.debug("Task thread %s is stopped, %s", current_thread().name,
                      f"{status_counter.total} jobs: {status_counter.success} success and {status_counter.failure} failure")  # noqa:E501
 
-    def submit(self, fn: Callable, *args: Any, **kwargs: Any) -> TaskJob:
-        return self.submit_delay_task(0.0, fn, *args, **kwargs)
+    def submit_job(self, job: TaskJob) -> TaskJob:
+        assert isinstance(job, TaskJob), f"{job} is not a TaskJob"
+        assert job.id not in self, f"{job} id is already in pool"
+        assert job.id > 0, f"{job} id is invalid"
+        self.jobs.put(job, block=True)
+        self.setdefault(job.id, job)
+        return job
+
+    def submit_task(self, fn: Callable, *args: Any, **kwargs: Any) -> TaskJob:
+        '''submit a task to jobs queue'''
+        with self.__intlock:  # generate job id under lock protection
+            sn: int = self.__counter.inc()  # serial number
+            return self.submit_job(TaskJob(sn, fn, *args, **kwargs))
 
     def submit_delay_task(self, delay: TimeUnit, fn: Callable, *args: Any, **kwargs: Any) -> TaskJob:  # noqa:E501
-        '''submit a task to jobs queue'''
-        sn: int  # serial number
+        '''submit a delay task to jobs queue'''
         with self.__intlock:  # generate job id under lock protection
-            sn = self.__counter.inc()
-        job: TaskJob = DelayTaskJob(delay, sn, fn, *args, **kwargs) if delay > 0.0 else TaskJob(sn, fn, *args, **kwargs)  # noqa:E501
-        self.jobs.put(job, block=True)
-        self.setdefault(sn, job)
-        assert self[sn] is job
-        return job
+            sn: int = self.__counter.inc()  # serial number
+            return self.submit_job(DelayTaskJob(delay, sn, fn, *args, **kwargs))  # noqa:E501
 
     def shutdown(self) -> None:
         '''stop all task threads and waiting for all jobs finish'''
