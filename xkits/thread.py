@@ -199,10 +199,11 @@ class TaskJob():
 
 class DelayTaskJob(TaskJob):
     '''Delay Task Job'''
+    MIN_DELAY_TIME: float = 0.001
 
     def __init__(self, delay: TimeUnit, no: int, fn: Callable, *args: Any, **kwargs: Any):  # noqa:E501
+        self.__delay_time: float = float(max(delay, self.MIN_DELAY_TIME))
         self.__delay_timer: TimeMeter = TimeMeter(startup=True)
-        self.__delay_time: float = float(max(delay, 1.0))
         super().__init__(no, fn, *args, **kwargs)
 
     @classmethod
@@ -219,15 +220,21 @@ class DelayTaskJob(TaskJob):
         '''job delay time'''
         return self.__delay_time
 
+    @property
+    def waiting(self) -> bool:
+        '''job waiting to run'''
+        return self.delay_timer.runtime < self.delay_time
+
     def renew(self, delay: Optional[TimeUnit] = None) -> None:
         '''renew delay time'''
         if delay is not None:
-            self.__delay_time = float(max(delay, 1.0))
+            self.__delay_time = float(max(delay, self.MIN_DELAY_TIME))
         self.delay_timer.restart()
 
     def run(self) -> bool:
         '''run delay job'''
         self.delay_timer.alarm(self.delay_time)
+        assert not self.waiting, f"{self} is waiting to run"
         return super().run()
 
 
@@ -308,6 +315,10 @@ class TaskPool(Dict[int, TaskJob]):  # noqa: E501, pylint: disable=too-many-inst
             if job is None:  # stop task
                 self.jobs.put(job)  # notice other tasks
                 break
+
+            if isinstance(job, DelayTaskJob) and job.waiting and self.running:
+                self.jobs.put(job)  # delay run task
+                continue
 
             if not job.run():
                 self.status_counter.inc(False)

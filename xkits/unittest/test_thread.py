@@ -96,7 +96,7 @@ class test_task_pool(unittest.TestCase):
             return job.result
 
         self.assertIsInstance(DelayTaskJob.create_task(handle, False), TaskJob)
-        job: DelayTaskJob = DelayTaskJob.create_delay_task(1.0, handle, False)
+        job: DelayTaskJob = DelayTaskJob.create_delay_task(0.01, handle, False)
         self.assertIsInstance(job, DelayTaskJob)
         self.assertRaises(LookupError, result, job)
         self.assertLess(job.running_timer.created_time, time())
