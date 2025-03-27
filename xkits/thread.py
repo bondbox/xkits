@@ -176,8 +176,8 @@ class DelayTaskJob(TaskJob):  # pylint: disable=too-many-instance-attributes
     '''Delay Task Job'''
 
     def __init__(self, delay: TimeUnit, no: int, fn: Callable, *args: Any, **kwargs: Any):  # noqa:E501
-        self.__timer: TimeMeter = TimeMeter(startup=True)
-        self.__delay: float = float(max(delay, 1.0))
+        self.__delay_timer: TimeMeter = TimeMeter(startup=True)
+        self.__delay_time: float = float(max(delay, 1.0))
         super().__init__(no, fn, *args, **kwargs)
 
     @classmethod
@@ -185,24 +185,24 @@ class DelayTaskJob(TaskJob):  # pylint: disable=too-many-instance-attributes
         return cls(delay, -1, fn, *args, **kwargs)
 
     @property
-    def timer(self) -> TimeMeter:
-        '''job timer'''
-        return self.__timer
+    def delay_timer(self) -> TimeMeter:
+        '''job delay timer'''
+        return self.__delay_timer
 
     @property
-    def delay(self) -> float:
+    def delay_time(self) -> float:
         '''job delay time'''
-        return self.__delay
+        return self.__delay_time
 
     def renew(self, delay: Optional[TimeUnit] = None) -> None:
         '''renew delay time'''
         if delay is not None:
-            self.__delay = float(max(delay, 1.0))
-        self.timer.restart()
+            self.__delay_time = float(max(delay, 1.0))
+        self.delay_timer.restart()
 
     def run(self) -> bool:
         '''run delay job'''
-        self.timer.alarm(self.delay)
+        self.delay_timer.alarm(self.delay_time)
         return super().run()
 
 
