@@ -50,7 +50,8 @@ class TimeMeter():
 
     def startup(self):
         if not self.started:
-            self.restart()
+            self.__started = time()
+            self.__stopped = 0.0
 
     def shutdown(self):
         if self.__always_running:
@@ -96,13 +97,13 @@ class DownMeter(TimeMeter):
         return self.lifetime > 0.0 and self.runtime > self.lifetime
 
     def reset(self):
-        self.restart()
+        super().restart()
 
     def renew(self, lifetime: Optional[TimeUnit] = None) -> None:
         '''renew timestamp and update lifetime(optional)'''
         if lifetime is not None:
             self.__lifetime = float(lifetime)
-        self.restart()
+        super().restart()
 
 
 class CountMeter():
