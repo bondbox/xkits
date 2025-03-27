@@ -127,9 +127,9 @@ class test_task_pool(unittest.TestCase):
             for index in range(15):
                 tasker.submit(lock, tasker, index)
             tasker.barrier()
-            self.assertEqual(tasker.counter, 15)
-            self.assertEqual(tasker.suceess, 8)
-            self.assertEqual(tasker.failure, 7)
+            self.assertEqual(tasker.status_counter.total, 15)
+            self.assertEqual(tasker.status_counter.success, 8)
+            self.assertEqual(tasker.status_counter.failure, 7)
             self.assertTrue(tasker.running)
             tasker.shutdown()
             self.assertFalse(tasker.running)

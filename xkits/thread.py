@@ -18,6 +18,8 @@ from typing import TypeVar
 
 from xkits.actuator import Logger
 from xkits.actuator import commands  # noqa:H306
+from xkits.meter import CountMeter
+from xkits.meter import StatusCountMeter
 from xkits.meter import TimeMeter
 from xkits.meter import TimeUnit
 
@@ -219,13 +221,12 @@ class TaskPool(Dict[int, TaskJob]):  # noqa: E501, pylint: disable=too-many-inst
         self.__cmds: commands = commands()
         self.__jobs: JobQueue = Queue(qsize)
         self.__prefix: str = prefix or "task"
+        self.__status: StatusCountMeter = StatusCountMeter()
+        self.__counter: CountMeter = CountMeter()
         self.__threads: Set[Thread] = set()
         self.__intlock: Lock = Lock()  # internal lock
         self.__running: bool = False
         self.__workers: int = wsize
-        self.__counter: int = 0
-        self.__suceess: int = 0
-        self.__failure: int = 0
         super().__init__()
 
     def __enter__(self):
@@ -266,42 +267,32 @@ class TaskPool(Dict[int, TaskJob]):  # noqa: E501, pylint: disable=too-many-inst
         return self.__workers
 
     @property
-    def counter(self) -> int:
-        '''task job counter'''
-        return self.__counter
-
-    @property
-    def suceess(self) -> int:
-        '''suceess job counter'''
-        return self.__suceess
-
-    @property
-    def failure(self) -> int:
-        '''suceess job counter'''
-        return self.__failure
+    def status_counter(self) -> StatusCountMeter:
+        '''task job status counter'''
+        return self.__status
 
     def task(self):
         '''execute a task from jobs queue'''
-        counter: int = 0
-        suceess: int = 0
-        failure: int = 0
+        status_counter: StatusCountMeter = StatusCountMeter()
+
         logger: Logger = self.cmds.logger
         logger.debug("Task thread %s is running", current_thread().name)
+
         while True:
             job: Optional[TaskJob] = self.jobs.get(block=True)
             if job is None:  # stop task
                 self.jobs.put(job)  # notice other tasks
                 break
-            counter += 1
+
             if not job.run():
-                self.__failure += 1
-                failure += 1
+                self.status_counter.inc(False)
+                status_counter.inc(False)
             else:
-                self.__suceess += 1
-                suceess += 1
+                self.status_counter.inc(True)
+                status_counter.inc(True)
+
         logger.debug("Task thread %s is stopped, %s", current_thread().name,
-                     f"{counter} jobs: {suceess} suceess and {failure} failure"
-                     )
+                     f"{status_counter.total} jobs: {status_counter.success} success and {status_counter.failure} failure")  # noqa:E501
 
     def submit(self, fn: Callable, *args: Any, **kwargs: Any) -> TaskJob:
         return self.submit_delay_task(0.0, fn, *args, **kwargs)
@@ -310,8 +301,7 @@ class TaskPool(Dict[int, TaskJob]):  # noqa: E501, pylint: disable=too-many-inst
         '''submit a task to jobs queue'''
         sn: int  # serial number
         with self.__intlock:  # generate job id under lock protection
-            self.__counter += 1
-            sn = self.__counter
+            sn = self.__counter.inc()
         job: TaskJob = DelayTaskJob(delay, sn, fn, *args, **kwargs) if delay > 0.0 else TaskJob(sn, fn, *args, **kwargs)  # noqa:E501
         self.jobs.put(job, block=True)
         self.setdefault(sn, job)
