@@ -4,6 +4,7 @@ from time import sleep
 from time import time
 import unittest
 
+from xkits import DaemonTaskJob
 from xkits import DelayTaskJob
 from xkits import NamedLock
 from xkits import TaskJob
@@ -133,6 +134,70 @@ class test_task_pool(unittest.TestCase):
             pool.submit(run_job, task)
             task.shutdown()
 
+    def test_daemon_job_1(self):
+        def handle():
+            sleep(0.01)
+
+        job: DaemonTaskJob = DaemonTaskJob.create_daemon_task(handle)
+        self.assertLess(job.running_timer.created_time, time())
+        self.assertEqual(job.running_timer.started_time, 0.0)
+        self.assertEqual(job.running_timer.stopped_time, 0.0)
+        self.assertEqual(job.daemon_counter.total, 0)
+        self.assertEqual(job.daemon_counter.success, 0)
+        self.assertEqual(job.daemon_counter.failure, 0)
+        self.assertFalse(job.daemon_running)
+        job.run_in_background()
+        self.assertLess(job.running_timer.created_time, time())
+        self.assertLess(job.running_timer.started_time, time())
+        self.assertTrue(job.daemon_running)
+        job.barrier()
+        self.assertLess(job.running_timer.created_time, time())
+        self.assertLess(job.running_timer.started_time, time())
+        self.assertGreater(job.daemon_counter.total, 0)
+        self.assertGreater(job.daemon_counter.success, 0)
+        self.assertEqual(job.daemon_counter.failure, 0)
+        self.assertTrue(job.daemon_running)
+        job.shutdown()
+        self.assertLess(job.running_timer.created_time, time())
+        self.assertLess(job.running_timer.started_time, time())
+        self.assertLess(job.running_timer.stopped_time, time())
+        self.assertGreater(job.daemon_counter.total, 0)
+        self.assertGreater(job.daemon_counter.success, 0)
+        self.assertEqual(job.daemon_counter.failure, 0)
+        self.assertFalse(job.daemon_running)
+
+    def test_daemon_job_2(self):
+        def handle():
+            raise Exception("test")
+
+        job: DaemonTaskJob = DaemonTaskJob.create_daemon_task(handle)
+        self.assertLess(job.running_timer.created_time, time())
+        self.assertEqual(job.running_timer.started_time, 0.0)
+        self.assertEqual(job.running_timer.stopped_time, 0.0)
+        self.assertEqual(job.daemon_counter.total, 0)
+        self.assertEqual(job.daemon_counter.success, 0)
+        self.assertEqual(job.daemon_counter.failure, 0)
+        self.assertFalse(job.daemon_running)
+        job.run_in_background()
+        self.assertLess(job.running_timer.created_time, time())
+        self.assertLess(job.running_timer.started_time, time())
+        self.assertTrue(job.daemon_running)
+        job.barrier()
+        self.assertLess(job.running_timer.created_time, time())
+        self.assertLess(job.running_timer.started_time, time())
+        self.assertGreater(job.daemon_counter.total, 0)
+        self.assertEqual(job.daemon_counter.success, 0)
+        self.assertGreater(job.daemon_counter.failure, 0)
+        self.assertTrue(job.daemon_running)
+        job.shutdown()
+        self.assertLess(job.running_timer.created_time, time())
+        self.assertLess(job.running_timer.started_time, time())
+        self.assertLess(job.running_timer.stopped_time, time())
+        self.assertGreater(job.daemon_counter.total, 0)
+        self.assertEqual(job.daemon_counter.success, 0)
+        self.assertGreater(job.daemon_counter.failure, 0)
+        self.assertFalse(job.daemon_running)
+
     def test_task(self):
         def lock(tasker: TaskPool, index: int):
             tasker.cmds.stdout(f"{index}")
@@ -141,13 +206,15 @@ class test_task_pool(unittest.TestCase):
         with TaskPool(8) as tasker:
             tasker.submit_job(TaskJob(123456, lock, tasker, 0))
             tasker.submit_delay_task(0.01, lock, tasker, 1)
-            tasker.submit_delay_task(0.01, lock, tasker, 2)
-            tasker.submit_task(lock, tasker, 3)
-            tasker.submit_task(lock, tasker, 4)
+            tasker.submit_delay_task(0.1, lock, tasker, 2)
+            tasker.submit_delay_task(0.5, lock, tasker, 3)
+            tasker.submit_delay_task(1.0, lock, tasker, 4)
+            tasker.submit_task(lock, tasker, 5)
+            tasker.submit_task(lock, tasker, 6)
             tasker.barrier()
-            self.assertEqual(tasker.status_counter.total, 5)
-            self.assertEqual(tasker.status_counter.success, 3)
-            self.assertEqual(tasker.status_counter.failure, 2)
+            self.assertEqual(tasker.status_counter.total, 7)
+            self.assertEqual(tasker.status_counter.success, 4)
+            self.assertEqual(tasker.status_counter.failure, 3)
             self.assertTrue(tasker.running)
             tasker.shutdown()
             self.assertFalse(tasker.running)

@@ -238,6 +238,60 @@ class DelayTaskJob(TaskJob):
         return super().run()
 
 
+class DaemonTaskJob(TaskJob):
+    '''Daemon Task Job'''
+
+    def __init__(self, no: int, fn: Callable, *args: Any, **kwargs: Any):
+        self.__counter: StatusCountMeter = StatusCountMeter()
+        super().__init__(no, fn, *args, **kwargs)
+        self.__running: bool = False
+
+    @classmethod
+    def create_daemon_task(cls, fn: Callable, *args: Any, **kwargs: Any) -> "DaemonTaskJob":  # noqa:E501
+        return cls(-1, fn, *args, **kwargs)
+
+    @property
+    def daemon_counter(self) -> StatusCountMeter:
+        '''daemon status counter'''
+        return self.__counter
+
+    @property
+    def daemon_running(self) -> bool:
+        '''daemon running flag'''
+        return self.__running
+
+    def run_in_background(self) -> Thread:
+        '''run job in daemon mode in background'''
+        thread: Thread = Thread(target=self.run)
+        thread.start()
+        return thread
+
+    def run(self):
+        '''run job in daemon mode'''
+        self.__running = True
+        while self.daemon_running:
+            success: bool = super().run()
+            self.daemon_counter.inc(success)
+
+    def shutdown(self) -> None:
+        '''wait for job to finish'''
+        self.__running = False
+        super().shutdown()
+
+    def startup(self) -> None:
+        '''same as run in background'''
+        self.run_in_background()
+
+    def restart(self) -> None:
+        '''restart job'''
+        self.shutdown()
+        self.startup()
+
+    def barrier(self) -> None:
+        '''same as restart'''
+        self.restart()
+
+
 if sys.version_info >= (3, 9):
     JobQueue = Queue[Optional[TaskJob]]  # noqa: E501, pragma: no cover, pylint: disable=unsubscriptable-object
 else:  # Python3.8 TypeError
