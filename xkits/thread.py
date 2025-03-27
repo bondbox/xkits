@@ -333,7 +333,11 @@ class TaskPool(Dict[int, TaskJob]):  # noqa: E501, pylint: disable=too-many-inst
                 thread.start()  # run
             self.__running = True
 
-    def barrier(self) -> None:
+    def restart(self) -> None:
         '''stop submit new tasks and waiting for all submitted tasks to end'''
         self.shutdown()
         self.startup()
+
+    def barrier(self) -> None:
+        '''same as restart'''
+        self.restart()
