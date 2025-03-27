@@ -9,9 +9,10 @@ TimeUnit = Union[float, int]
 
 
 class TimeMeter():
-    def __init__(self, start: bool = True):
+    def __init__(self, startup: bool = True, always: bool = False):
         timestamp: float = time()
-        self.__started: float = timestamp if start else 0.0
+        self.__always_running: bool = always
+        self.__started: float = timestamp if startup else 0.0
         self.__created: float = timestamp
         self.__stopped: float = 0.0
 
@@ -50,6 +51,9 @@ class TimeMeter():
             self.restart()
 
     def shutdown(self):
+        if self.__always_running:
+            raise RuntimeError(f"TimeMeter({self}) cannot shutdown")
+
         if self.started:
             self.__stopped = time()
 
@@ -71,9 +75,9 @@ class TimeMeter():
 
 
 class DownMeter(TimeMeter):
-    def __init__(self, lifetime: TimeUnit = 0.0):
+    def __init__(self, lifetime: TimeUnit = 0.0, startup: bool = True):
         self.__lifetime: float = max(float(lifetime), 0.0)
-        super().__init__(start=True)
+        super().__init__(startup=startup, always=True)
 
     @property
     def lifetime(self) -> float:
@@ -95,6 +99,3 @@ class DownMeter(TimeMeter):
         if lifetime is not None:
             self.__lifetime = float(lifetime)
         self.restart()
-
-    def shutdown(self):
-        raise RuntimeError("DownMeter cannot shutdown")

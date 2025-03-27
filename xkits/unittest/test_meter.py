@@ -25,7 +25,7 @@ class TestTimeMeter(unittest.TestCase):
     @mock.patch.object(meter, "time")
     def test_runtime(self, mock_time):
         mock_time.side_effect = [1.0, 2.0, 3.0, 4.0, 5.0]
-        timer = meter.TimeMeter(start=False)
+        timer = meter.TimeMeter(startup=False)
         self.assertEqual(timer.created_time, 1.0)
         self.assertEqual(timer.started_time, 0.0)
         self.assertEqual(timer.stopped_time, 0.0)
@@ -41,7 +41,7 @@ class TestTimeMeter(unittest.TestCase):
     @mock.patch.object(meter, "time")
     def test_restart(self, mock_time):
         mock_time.side_effect = [1.0, 2.0, 3.0]
-        timer = meter.TimeMeter(start=True)
+        timer = meter.TimeMeter(startup=True)
         self.assertEqual(timer.created_time, 1.0)
         self.assertEqual(timer.started_time, 1.0)
         self.assertEqual(timer.stopped_time, 0.0)
@@ -63,7 +63,7 @@ class TestTimeMeter(unittest.TestCase):
     @mock.patch.object(meter, "time")
     def test_startup(self, mock_time):
         mock_time.side_effect = [1.0, 2.0]
-        timer = meter.TimeMeter(start=False)
+        timer = meter.TimeMeter(startup=False)
         self.assertEqual(timer.created_time, 1.0)
         self.assertEqual(timer.started_time, 0.0)
         self.assertEqual(timer.stopped_time, 0.0)
@@ -85,7 +85,7 @@ class TestTimeMeter(unittest.TestCase):
     @mock.patch.object(meter, "time")
     def test_shutdown(self, mock_time):
         mock_time.side_effect = [1.0, 2.0]
-        timer = meter.TimeMeter(start=True)
+        timer = meter.TimeMeter(startup=True)
         self.assertEqual(timer.created_time, 1.0)
         self.assertEqual(timer.started_time, 1.0)
         self.assertEqual(timer.stopped_time, 0.0)
@@ -108,7 +108,7 @@ class TestTimeMeter(unittest.TestCase):
     @mock.patch.object(meter, "sleep")
     def test_alarm(self, mock_sleep, mock_time):
         mock_time.side_effect = [1.0, 2.0, 3.0, 5.0]
-        timer = meter.TimeMeter(start=False)
+        timer = meter.TimeMeter(startup=False)
         self.assertEqual(timer.created_time, 1.0)
         self.assertEqual(timer.started_time, 0.0)
         self.assertEqual(timer.stopped_time, 0.0)
@@ -121,7 +121,7 @@ class TestTimeMeter(unittest.TestCase):
     @mock.patch.object(meter, "time")
     def test_reset(self, mock_time):
         mock_time.side_effect = [1.0]
-        timer = meter.TimeMeter(start=True)
+        timer = meter.TimeMeter(startup=True)
         self.assertEqual(timer.created_time, 1.0)
         self.assertEqual(timer.started_time, 1.0)
         self.assertEqual(timer.stopped_time, 0.0)
