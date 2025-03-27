@@ -1,5 +1,6 @@
 # coding:utf-8
 
+from time import sleep
 from time import time
 import unittest
 
@@ -98,25 +99,39 @@ class test_task_pool(unittest.TestCase):
         job: DelayTaskJob = DelayTaskJob.create_delay_task(1.0, handle, False)
         self.assertIsInstance(job, DelayTaskJob)
         self.assertRaises(LookupError, result, job)
-        self.assertLess(job.created_time, time())
-        self.assertEqual(job.started_time, 0.0)
-        self.assertEqual(job.stopped_time, 0.0)
-        self.assertFalse(job.started)
-        self.assertFalse(job.stopped)
+        self.assertLess(job.running_timer.created_time, time())
+        self.assertEqual(job.running_timer.started_time, 0.0)
+        self.assertEqual(job.running_timer.stopped_time, 0.0)
+        self.assertFalse(job.running_timer.started)
+        self.assertFalse(job.running_timer.stopped)
         self.assertEqual(job.id, -1)
         self.assertTrue(job.run())
         self.assertFalse(job.result)
         self.assertIsNone(job.renew(1.0))
-        self.assertLess(job.created_time, time())
-        self.assertLess(job.started_time, time())
-        self.assertLess(job.stopped_time, time())
-        self.assertFalse(job.started)
-        self.assertTrue(job.stopped)
-        self.assertTrue(job.run())
-        job.startup()
-        self.assertTrue(job.started)
-        self.assertFalse(job.stopped)
+        self.assertLess(job.running_timer.created_time, time())
+        self.assertLess(job.running_timer.started_time, time())
+        self.assertLess(job.running_timer.stopped_time, time())
+        self.assertFalse(job.running_timer.started)
+        self.assertTrue(job.running_timer.stopped)
+        self.assertIsNone(job.barrier())
+        self.assertIsNone(job.restart())
+        job.running_timer.startup()
+        self.assertTrue(job.running_timer.started)
+        self.assertFalse(job.running_timer.stopped)
         self.assertFalse(job.run())
+        self.assertFalse(job.running_timer.started)
+        self.assertTrue(job.running_timer.stopped)
+
+        def sleep_task(seconds: float = 1.0):
+            sleep(seconds)
+
+        def run_job(job: TaskJob):
+            job.run()
+
+        with ThreadPool(1) as pool:
+            task: TaskJob = TaskJob.create_task(sleep_task, 0.5)
+            pool.submit(run_job, task)
+            task.shutdown()
 
     def test_task(self):
         def lock(tasker: TaskPool, index: int):

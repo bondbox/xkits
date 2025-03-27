@@ -19,5 +19,5 @@ with TaskPool(workers=4) as executor:
     print("all tasks submitted")
     # executor.barrier()
     for jid, job in executor.items():
-        if not job.stopped:
+        if not job.running_timer.stopped:
             print(f"job {jid} not stopped")

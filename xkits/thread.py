@@ -6,6 +6,7 @@ import sys
 from threading import Lock
 from threading import Thread
 from threading import current_thread  # noqa:H306
+from time import sleep
 from typing import Any
 from typing import Callable
 from typing import Dict
@@ -109,7 +110,7 @@ class ThreadPool(ThreadPoolExecutor):
         return {thread for thread in self.other_threads if thread.is_alive()}
 
 
-class TaskJob(TimeMeter):  # pylint: disable=too-many-instance-attributes
+class TaskJob():
     '''Task Job'''
 
     def __init__(self, no: int, fn: Callable, *args: Any, **kwargs: Any):
@@ -117,8 +118,8 @@ class TaskJob(TimeMeter):  # pylint: disable=too-many-instance-attributes
         self.__fn: Callable = fn
         self.__args: Tuple[Any, ...] = args
         self.__kwargs: Dict[str, Any] = kwargs
-        self.__result: Any = LookupError(f"Job{no} is not started")
-        super().__init__(startup=False)
+        self.__result: Any = LookupError(f"{self} is not started")
+        self.__running_timer: TimeMeter = TimeMeter(startup=False)
 
     @classmethod
     def create_task(cls, fn: Callable, *args: Any, **kwargs: Any) -> "TaskJob":
@@ -127,7 +128,7 @@ class TaskJob(TimeMeter):  # pylint: disable=too-many-instance-attributes
     def __str__(self) -> str:
         args = list(self.args) + list(f"{k}={v}" for k, v in self.kwargs)
         info: str = ", ".join(f"{a}" for a in args)
-        return f"Job{self.id} {self.fn}({info})"
+        return f"{self.__class__.__name__}{self.id} {self.fn}({info})"
 
     @property
     def id(self) -> int:
@@ -156,23 +157,47 @@ class TaskJob(TimeMeter):  # pylint: disable=too-many-instance-attributes
             raise self.__result
         return self.__result
 
+    @property
+    def running_timer(self) -> TimeMeter:
+        '''job running timer'''
+        return self.__running_timer
+
     def run(self) -> bool:
         '''run job'''
         try:
-            if self.started:
+            if self.running_timer.started:
                 raise RuntimeError(f"{self} is already started")
-            self.startup()
-            assert self.started
+            assert not self.running_timer.started, f"{self} is already started"
+            self.running_timer.startup()
+            assert self.running_timer.started, f"failed to start {self}"
             self.__result = self.fn(*self.args, **self.kwargs)
             return True
         except Exception as error:  # pylint: disable=broad-exception-caught
             self.__result = error
             return False
         finally:
-            self.shutdown()
+            self.running_timer.shutdown()
+
+    def shutdown(self) -> None:
+        '''wait for job to finish'''
+        while self.running_timer.started:
+            sleep(0.05)
+
+    def startup(self) -> None:
+        '''same as run'''
+        self.run()
+
+    def restart(self) -> None:
+        '''restart job'''
+        self.shutdown()
+        self.startup()
+
+    def barrier(self) -> None:
+        '''same as shutdown'''
+        self.shutdown()
 
 
-class DelayTaskJob(TaskJob):  # pylint: disable=too-many-instance-attributes
+class DelayTaskJob(TaskJob):
     '''Delay Task Job'''
 
     def __init__(self, delay: TimeUnit, no: int, fn: Callable, *args: Any, **kwargs: Any):  # noqa:E501
