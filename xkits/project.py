@@ -272,15 +272,16 @@ setup(
 @add_command("init", help="Initialize a command-line project.")
 def add_cmd_init(_arg: argp):
     _arg.add_opt_on("--update", help="allow updating existing files")
-    _arg.add_argument("--license", type=str, nargs=1, metavar="LICENSE",
-                      default=["MIT"], help="select license, default to MIT")
+    _arg.add_argument("--license", help="select license, default to MIT",
+                      type=str, metavar="LICENSE", default="MIT",
+                      choices=["MIT", "GPLv2", "GPLv3"])
     _arg.add_pos("project_name", type=str, metavar="PROJECT")
 
 
 @run_command(add_cmd_init)
 def run_cmd_init(cmds: commands) -> int:
     return project(name=cmds.args.project_name,
-                   license=cmds.args.license[0],
+                   license=cmds.args.license,
                    allow_update=cmds.args.update
                    ).create()
 
