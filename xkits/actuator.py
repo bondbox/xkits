@@ -21,7 +21,6 @@ from xkits.attribute import __prog_name__
 from xkits.colorful import color
 from xkits.logger import log
 from xkits.parser import argp
-from xkits.utils import singleton
 
 
 class add_command:
@@ -171,7 +170,7 @@ class run_command:
         cmd_bind.subs = sub_cmds
         for sub in sub_cmds:
             sub.prev = cmd_bind
-        commands().root = cmd_bind.root
+        cmd_bind.cmds.root = cmd_bind.root
         self.__skip: bool = skip
         self.__bind: add_command = cmd_bind
         self.__prep: Optional["pre_command"] = None
@@ -303,7 +302,6 @@ class end_command:
         return self.__main
 
 
-@singleton
 class commands(log):
     '''Singleton command-line tool based on argparse.
 
@@ -347,13 +345,23 @@ class commands(log):
 
     LOGGER_ARGUMENT_GROUP = "logger options"
 
+    __INSTANCE: Optional["commands"] = None
+    __INITIALIZED: bool = False
+
     def __init__(self):
-        self.__prog: str = __prog_name__
-        self.__root: Optional[add_command] = None
-        self.__args: Namespace = Namespace()
-        self.__version: Optional[str] = None
-        self.__enabled_logger: bool = True
-        super().__init__()
+        if not self.__INITIALIZED:
+            self.__prog: str = __prog_name__
+            self.__root: Optional[add_command] = None
+            self.__args: Namespace = Namespace()
+            self.__version: Optional[str] = None
+            self.__enabled_logger: bool = True
+            self.__INITIALIZED = True
+            super().__init__()
+
+    def __new__(cls):
+        if not cls.__INSTANCE:
+            cls.__INSTANCE = super(commands, cls).__new__(cls)
+        return cls.__INSTANCE
 
     @property
     def prog(self) -> str:

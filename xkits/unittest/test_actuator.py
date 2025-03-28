@@ -23,7 +23,7 @@ from xkits.attribute import __version__
 
 @add_command("debug", help="test logger level")
 def add_cmd_debug(_arg: argp):
-    commands().stderr_red("debug")
+    commands.stderr_red("debug")
     _arg.add_opt_on("-d", "--debug")
 
 
@@ -35,7 +35,7 @@ def run_cmd_debug(cmds: commands) -> int:
 
 @add_command("known", help="test preparse")
 def add_cmd_known(_arg: argp):
-    commands().stdout_green("known")
+    commands.stdout_green("known")
     _arg.preparse_from_sys_argv()
 
 
@@ -47,7 +47,7 @@ def run_cmd_known(cmds: commands) -> int:
 
 @add_command("list", description="test list")
 def add_cmd_list(_arg: argp):
-    commands().stdout("list")
+    commands.stdout("list")
 
 
 @run_command(add_cmd_list, add_cmd_debug, add_cmd_known)
@@ -58,7 +58,7 @@ def run_cmd_list(cmds: commands) -> int:
 
 @add_command("incomplete", help="test incomplete")
 def add_cmd_incomplete(_arg: argp):
-    commands().stderr("error")
+    commands.stderr("error")
 
 
 @run_command(add_cmd_incomplete)
@@ -69,7 +69,7 @@ def run_cmd_incomplete(cmds: commands) -> int:
 
 @add_command("keyboard", help="test KeyboardInterrupt")
 def add_cmd_keyboard(_arg: argp):
-    commands().stdout("keyboard")
+    commands.stdout("keyboard")
 
 
 @run_command(add_cmd_keyboard)
@@ -80,7 +80,7 @@ def run_cmd_keyboard(cmds: commands) -> int:
 
 @add_command("exception", help="test BaseException")
 def add_cmd_exception(_arg: argp):
-    commands().stdout("exception")
+    commands.stdout("exception")
 
 
 @run_command(add_cmd_exception)
@@ -91,7 +91,7 @@ def run_cmd_exception(cmds: commands) -> int:
 
 @add_command("prepare", help="test prepare")
 def add_cmd_prepare(_arg: argp):
-    commands().stdout("prepare")
+    commands.stdout("prepare")
 
 
 @run_command(add_cmd_prepare)
@@ -107,7 +107,7 @@ def pre_cmd_prepare(cmds: commands) -> int:
 
 @add_command("purge", help="test purge")
 def add_cmd_purge(_arg: argp):
-    commands().stdout("purge")
+    commands.stdout("purge")
 
 
 @run_command(add_cmd_purge)
@@ -123,7 +123,7 @@ def end_cmd_purge(cmds: commands) -> int:
 
 @add_command("example", description="example")
 def add_cmd(_arg: argp):
-    commands().stdout("test")
+    commands.stdout("test")
 
 
 @run_command(add_cmd, add_cmd_list, add_cmd_incomplete,
