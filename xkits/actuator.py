@@ -405,23 +405,27 @@ class commands(log):
         '''Logger.'''
         return self.get_logger(self.prog)
 
-    def stdout(self, context: Any):
+    @classmethod
+    def stdout(cls, context: Any):
         '''Output string to sys.stdout.'''
         sys.stdout.write(f"{context}\n")
         sys.stdout.flush()
 
-    def stdout_green(self, context: Any):
+    @classmethod
+    def stdout_green(cls, context: Any):
         '''Output string to sys.stdout with green color.'''
-        self.stdout(color.green(context))
+        cls.stdout(color.green(context))
 
-    def stderr(self, context: Any):
+    @classmethod
+    def stderr(cls, context: Any):
         '''Output string to sys.stderr.'''
         sys.stderr.write(f"{context}\n")
         sys.stderr.flush()
 
-    def stderr_red(self, context: Any):
+    @classmethod
+    def stderr_red(cls, context: Any):
         '''Output string to sys.stderr with red color.'''
-        self.stderr(color.red(context))
+        cls.stderr(color.red(context))
 
     def __add_optional_version(self, _arg: argp):
         version = self.version
