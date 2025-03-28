@@ -267,7 +267,7 @@ class DaemonTaskJob(TaskJob):
         return thread
 
     def run(self):
-        '''run job in daemon mode'''
+        '''run job in daemon mode in current thread'''
         self.__running = True
         while self.daemon_running:
             success: bool = super().run()
