@@ -18,7 +18,7 @@ from typing import Sequence
 from typing import Tuple
 
 from xkits.attribute import __prog_name__
-from xkits.logger import log
+from xkits.logger import Logger as Log
 from xkits.parser import argp
 
 
@@ -301,7 +301,7 @@ class end_command:
         return self.__main
 
 
-class commands(log):
+class commands(Log):
     '''Singleton command-line tool based on argparse.
 
     Define and bind all callback functions before calling run() or parse().
@@ -557,9 +557,9 @@ class commands(log):
 
         handlers: List[logging.Handler] = []
         if console is not None:
-            handlers.append(log.new_stream_handler(stream=console, fmt=fmt))
+            handlers.append(Log.new_stream_handler(stream=console, fmt=fmt))
         for filename in parse_files():
-            handlers.append(log.new_file_handler(filename=filename, fmt=fmt))
+            handlers.append(Log.new_file_handler(filename=filename, fmt=fmt))
         self.initiate_logger(self.logger, level=level_name, handlers=handlers)
 
     def __add_parser(self, _map: Dict[add_command, argp],

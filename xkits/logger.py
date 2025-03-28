@@ -48,7 +48,7 @@ class once_filter(logging.Filter):
         return self.interval_seconds > self.max_interval_seconds
 
 
-class log:
+class Logger:
     class LOG_LEVELS(Enum):
         CRITICAL = "fatal"
         ERROR = "error"

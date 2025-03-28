@@ -18,13 +18,13 @@ class test_log(unittest.TestCase):
         pass
 
     def setUp(self):
-        self.log = logger.log()
+        self.logger = logger.Logger()
 
     def tearDown(self):
         pass
 
     def test_initiate_logger(self):
-        self.log.initiate_logger(self.log.get_logger())
+        self.logger.initiate_logger(self.logger.get_logger())
 
     @mock.patch.object(logger.os, "makedirs", mock.MagicMock())
     @mock.patch.object(logger.os.path, "isdir", mock.MagicMock(side_effect=[True]))  # noqa:E501
@@ -32,7 +32,7 @@ class test_log(unittest.TestCase):
     @mock.patch.object(logger.os.path, "dirname", mock.MagicMock())
     @mock.patch.object(logger.logging, "FileHandler", mock.MagicMock())
     def test_new_file_handler(self):
-        self.log.new_file_handler("unittest.log")
+        self.logger.new_file_handler("unittest.log")
 
 
 if __name__ == "__main__":

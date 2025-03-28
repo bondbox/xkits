@@ -21,6 +21,7 @@ from xkits.colorful import Fore  # noqa:F401
 from xkits.colorful import Style  # noqa:F401
 from xkits.colorful import color  # noqa:F401,H306
 from xkits.executor import hourglass  # noqa:F401
+from xkits.logger import Logger  # noqa:F401
 from xkits.meter import CountMeter  # noqa:F401
 from xkits.meter import DownMeter  # noqa:F401
 from xkits.meter import StatusCountMeter  # noqa:F401
