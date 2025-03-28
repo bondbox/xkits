@@ -5,6 +5,7 @@ import logging
 import os
 import sys
 from time import time
+from typing import Any
 from typing import Iterable
 from typing import List
 from typing import Optional
@@ -15,6 +16,7 @@ from colorlog import ColoredFormatter
 from colorlog.formatter import LogColors
 
 from xkits.attribute import __prog_name__ as prog
+from xkits.colorful import color
 
 
 class once_filter(logging.Filter):
@@ -133,3 +135,25 @@ class log:
         handler: logging.FileHandler = logging.FileHandler(filename=filename)
         handler.setFormatter(formatter)
         return handler
+
+    @classmethod
+    def stdout(cls, context: Any):
+        '''Output string to sys.stdout.'''
+        sys.stdout.write(f"{context}\n")
+        sys.stdout.flush()
+
+    @classmethod
+    def stdout_green(cls, context: Any):
+        '''Output string to sys.stdout with green color.'''
+        cls.stdout(color.green(context))
+
+    @classmethod
+    def stderr(cls, context: Any):
+        '''Output string to sys.stderr.'''
+        sys.stderr.write(f"{context}\n")
+        sys.stderr.flush()
+
+    @classmethod
+    def stderr_red(cls, context: Any):
+        '''Output string to sys.stderr with red color.'''
+        cls.stderr(color.red(context))

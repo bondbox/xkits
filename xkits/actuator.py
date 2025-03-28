@@ -18,7 +18,6 @@ from typing import Sequence
 from typing import Tuple
 
 from xkits.attribute import __prog_name__
-from xkits.colorful import color
 from xkits.logger import log
 from xkits.parser import argp
 
@@ -412,28 +411,6 @@ class commands(log):
     def logger(self) -> Logger:
         '''Logger.'''
         return self.get_logger(self.prog)
-
-    @classmethod
-    def stdout(cls, context: Any):
-        '''Output string to sys.stdout.'''
-        sys.stdout.write(f"{context}\n")
-        sys.stdout.flush()
-
-    @classmethod
-    def stdout_green(cls, context: Any):
-        '''Output string to sys.stdout with green color.'''
-        cls.stdout(color.green(context))
-
-    @classmethod
-    def stderr(cls, context: Any):
-        '''Output string to sys.stderr.'''
-        sys.stderr.write(f"{context}\n")
-        sys.stderr.flush()
-
-    @classmethod
-    def stderr_red(cls, context: Any):
-        '''Output string to sys.stderr with red color.'''
-        cls.stderr(color.red(context))
 
     def __add_optional_version(self, _arg: argp):
         version = self.version
